@@ -26,7 +26,6 @@
             --accent-color: #5271FF;
             --accent-color-dark: #455ECE;
             --negative-color: #e84545;
-            --gemini-purple: #8e44ad; /* Cor antiga, mantida para referência */
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -96,8 +95,6 @@
             width: 100%; padding: 15px; border: none; border-radius: 8px; color: white;
             font-size: 1.1em; cursor: pointer; transition: background-color: 0.2s;
         }
-        
-        /* ALTERAÇÃO APLICADA AQUI */
         #sign-in-button { 
             background-color: var(--accent-color); 
             margin-bottom: 15px; 
@@ -105,7 +102,6 @@
         #sign-in-button:hover { 
             background-color: var(--accent-color-dark); 
         }
-        
         .message { margin-top: 15px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
         .message.error { color: #fff; background-color: rgba(220, 53, 69, 0.5); }
         .message.success { color: #fff; background-color: rgba(40, 167, 69, 0.5); }
@@ -212,12 +208,12 @@
 
         // --- Configuração do Firebase ---
         const firebaseConfig = {
-            apiKey: "AIzaSyB3xbnaVIViIX0-WvZTA7KUkYxKpH-fqPs", // Substitua pela sua chave, se necessário
-            authDomain: "ebookxtrader.firebaseapp.com",
-            projectId: "ebookxtrader",
-            storageBucket: "ebookxtrader.appspot.com",
-            messagingSenderId: "682023817418",
-            appId: "1:682023817418:web:1eeba2841ae553e2716433"
+          apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
+          authDomain: "calculadora-ir-56a2c.firebaseapp.com",
+          projectId: "calculadora-ir-56a2c",
+          storageBucket: "calculadora-ir-56a2c.firebasestorage.app",
+          messagingSenderId: "613402077853",
+          appId: "1:613402077853:web:244d838cc2a99452288274"
         };
 
         const app = initializeApp(firebaseConfig);
