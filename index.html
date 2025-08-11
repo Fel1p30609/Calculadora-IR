@@ -88,21 +88,6 @@
         .main-tab-button.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
         .main-tab-button:not(.active) { color: var(--text-primary); }
         .main-tab-button:not(.active):hover { color: var(--text-headings); }
-
-        .tab-button {
-            padding: 0.75rem 1.5rem; border-radius: 4px 4px 0 0; font-weight: 500;
-            transition: all 0.2s; border-bottom: 2px solid transparent;
-        }
-        .tab-button.active { 
-            color: var(--text-headings); 
-            background-color: var(--card-bg-glass); 
-            border: 1px solid var(--border-color-glass);
-            border-bottom: 1px solid transparent;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .tab-button:not(.active) { color: var(--text-primary); border-bottom: 1px solid var(--border-color-glass); }
-        .tab-button:not(.active):hover { color: var(--text-headings); }
         
         .text-header { color: var(--text-headings); }
         .text-subheader { color: var(--text-primary); }
@@ -131,11 +116,7 @@
             <div class="space-y-8">
                 <div class="card p-6">
                     <h3 class="text-xl font-bold mb-4 text-content-strong">Fonte de Dados das Transações</h3>
-                    <div class="border-b border-border-color mb-6">
-                        <button id="tab-btn-manual" onclick="switchInputMethod('manual')" class="tab-button active">Lançamento Manual</button>
-                        <button id="tab-btn-file" onclick="switchInputMethod('file')" class="tab-button">Carregar Arquivo CSV</button>
-                    </div>
-                    <div id="input-manual">
+                    <div>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div><label for="trans-date" class="block text-sm font-medium text-primary">Data</label><input type="date" id="trans-date" class="input-field mt-1"></div>
                             <div><label for="trans-type" class="block text-sm font-medium text-primary">Tipo</label><select id="trans-type" class="input-field mt-1"><option value="Envio">Envio</option><option value="Retirada">Retirada</option></select></div>
@@ -143,9 +124,6 @@
                             <button onclick="addTransaction()" class="btn btn-secondary w-full">Adicionar +</button>
                         </div>
                         <div id="transactions-list" class="mt-6"></div>
-                    </div>
-                    <div id="input-file" class="hidden">
-                        <input type="file" id="transactions-file" accept=".csv" class="input-field">
                     </div>
                 </div>
 
@@ -196,11 +174,8 @@
             const drops = Array.from({ length: columns }).fill(1).map(() => Math.random() * height);
 
             function draw() {
-                // Rastro bem sutil, fazendo os números desaparecerem lentamente
                 ctx.fillStyle = `rgba(10, 25, 47, 0.04)`;
                 ctx.fillRect(0, 0, width, height);
-
-                // Cor dos números com baixa opacidade (30%)
                 ctx.fillStyle = `rgba(136, 146, 176, 0.3)`; 
                 ctx.font = `${fontSize}px monospace`;
                 
@@ -208,14 +183,13 @@
                     if (drops[i] * fontSize > height && Math.random() > 0.98) {
                         drops[i] = 0;
                     }
-                    
                     const text = charArray[Math.floor(Math.random() * charArray.length)];
                     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
                     drops[i]++;
                 }
             }
             
-            setInterval(draw, 60); // Intervalo mais lento para uma queda mais suave
+            setInterval(draw, 60);
 
             let resizeTimeout;
             window.addEventListener('resize', () => {
@@ -241,20 +215,6 @@
             document.querySelectorAll('.main-tab-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`main-content-${tabName}`).classList.remove('hidden');
             document.getElementById(`main-tab-${tabName}`).classList.add('active');
-        }
-
-        function switchInputMethod(method) {
-            const manualDiv = document.getElementById('input-manual');
-            const fileDiv = document.getElementById('input-file');
-            const manualBtn = document.getElementById('tab-btn-manual');
-            const fileBtn = document.getElementById('tab-btn-file');
-            if (method === 'manual') {
-                manualDiv.classList.remove('hidden'); fileDiv.classList.add('hidden');
-                manualBtn.classList.add('active'); fileBtn.classList.remove('active');
-            } else {
-                manualDiv.classList.add('hidden'); fileDiv.classList.remove('hidden');
-                fileBtn.classList.add('active'); manualBtn.classList.remove('active');
-            }
         }
 
         function showLoader(containerId, message = "Processando...") {
@@ -301,27 +261,17 @@
             showLoader('results-area-cambial');
             const ratesFile = document.getElementById('rates-file').files[0];
             if (!ratesFile) { showError('results-area-cambial', 'O arquivo de cotações é obrigatório.'); return; }
-            const inputMethod = document.getElementById('input-file').classList.contains('hidden') ? 'manual' : 'file';
+            
             try {
-                const ratesData = await parseFile(ratesFile); let transactions = [];
-                if (inputMethod === 'manual') {
-                    if (manualTransactions.length === 0) { showError('results-area-cambial', 'Nenhuma transação manual foi adicionada.'); return; }
-                    transactions = manualTransactions;
-                } else {
-                    const transactionsFile = document.getElementById('transactions-file').files[0];
-                    if (!transactionsFile) { showError('results-area-cambial', 'Por favor, selecione o arquivo de transações.'); return; }
-                    const transactionsRaw = await parseFile(transactionsFile);
-                    transactionsRaw.slice(1).forEach(([dateStr, type, valueStr]) => {
-                        if (!dateStr || !type || !valueStr) return;
-                        const dateParts = dateStr.split('/'); if (dateParts.length !== 3) return;
-                        const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00Z`);
-                        const value = parseFloat(String(valueStr).replace(/\./g, '').replace(',', '.'));
-                        if (!isNaN(date.getTime()) && !isNaN(value)) transactions.push({ date, type: type.trim(), value });
-                    });
-                    transactions.sort((a, b) => a.date - b.date);
+                const ratesData = await parseFile(ratesFile);
+                if (manualTransactions.length === 0) { 
+                    showError('results-area-cambial', 'Nenhuma transação manual foi adicionada.'); 
+                    return; 
                 }
-                processAndRenderCambial(transactions, ratesData);
-            } catch (error) { showError('results-area-cambial', `Ocorreu um erro: ${error.message}`); }
+                processAndRenderCambial(manualTransactions, ratesData);
+            } catch (error) { 
+                showError('results-area-cambial', `Ocorreu um erro: ${error.message}`); 
+            }
         }
 
         function processAndRenderCambial(transactions, ratesRaw) {
