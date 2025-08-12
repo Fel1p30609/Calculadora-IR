@@ -84,6 +84,12 @@
         .message.success { color: #fff; background-color: rgba(63, 185, 80, 0.5); border: 1px solid rgba(63,185,80,0.8); }
 
         #auth-container { position: fixed; top: 1rem; right: 1rem; z-index: 1001; background: var(--card-bg); backdrop-filter: blur(10px); padding: 0.5rem 0.75rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--border-color); }
+
+        #tour-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none; }
+        #tour-overlay.active { opacity: 1; pointer-events: all; }
+        .tour-highlight { position: absolute; transition: var(--transition-fluid); border: 2px solid var(--accent-color); box-shadow: 0 0 25px 5px rgba(88, 166, 255, 0.6); border-radius: 8px; }
+        .tour-tooltip { position: absolute; z-index: 9999; background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid var(--border-color); width: 320px; padding: 1.5rem; animation: fadeInUp 0.4s var(--transition-fluid) both; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .tour-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); margin-top: 1.5rem; padding-top: 1rem;}
         
         .important-note { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background-color: rgba(210, 153, 34, 0.1); border-left: 4px solid var(--warning-color); }
         .important-note p:first-child { color: var(--warning-color); font-weight: 600;}
@@ -100,6 +106,69 @@
         .alocar-card-title { font-size: 1rem; font-weight: 700; color: var(--text-headings); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .alocar-card-value { font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
 
+        /* ESTILOS PARA O TUTORIAL */
+        #tutorial-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(10, 25, 47, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        #tutorial-modal {
+            background-color: var(--main-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        #close-tutorial {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            font-size: 2rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            line-height: 1;
+        }
+        #tutorial-modal h2 {
+            color: var(--text-headings);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        #tutorial-modal h3 {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        #tutorial-modal ol {
+            list-style-type: decimal;
+            list-style-position: inside;
+            padding-left: 0.5rem;
+        }
+        #tutorial-modal li {
+            margin-bottom: 0.75rem;
+        }
+        #tutorial-modal code {
+            background-color: var(--border-color);
+            color: var(--text-white);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
         /* ESTILOS PARA TELA DE CARREGAMENTO E ANIMAÇÃO DE LOGO */
         #loading-overlay {
             position: fixed;
@@ -115,7 +184,7 @@
         }
 
         .logo-container {
-            width: 250px;
+            width: 250px; /* Ajuste o tamanho do seu logo na tela aqui */
         }
 
         #animated-logo path {
@@ -136,14 +205,6 @@
         #loading-overlay .loading-content .loader {
             display: none;
         }
-
-        /* ESTILOS PARA O TOUR INTERATIVO */
-        #tour-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none; }
-        #tour-overlay.active { opacity: 1; pointer-events: all; }
-        .tour-highlight { position: absolute; transition: var(--transition-fluid); border: 2px solid var(--accent-color); box-shadow: 0 0 25px 5px rgba(88, 166, 255, 0.6); border-radius: 8px; }
-        .tour-tooltip { position: absolute; z-index: 9999; background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid var(--border-color); width: 320px; padding: 1.5rem; animation: fadeInUp 0.4s var(--transition-fluid) both; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .tour-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); margin-top: 1.5rem; padding-top: 1rem;}
-
 
         @media print {
             body, #calculator-content, .content-wrapper { background-color: #ffffff !important; color: #000000 !important; }
@@ -202,7 +263,7 @@
         <div class="content-wrapper">
             <header class="mb-12 flex justify-between items-center relative stagger-in" style="--stagger-index: 0;">
                 <div class="flex items-center gap-4">
-                    <img src="xtraderbrancoLOGO.png" alt="Logo XTributation" class="h-10">
+                    <img src="./xtraderbrancoLOGO.png" alt="Logo XTributation" class="h-10">
                     <div>
                         <h1 class="text-3xl font-bold text-white tracking-tighter">XTributation</h1>
                         <p class="text-base text-text-primary">Plataforma de Imposto de Renda XTraders</p>
@@ -293,10 +354,35 @@
         </div>
     </div>
 
+    <div id="tutorial-overlay" class="hidden">
+        <div id="tutorial-modal">
+            <span id="close-tutorial">&times;</span>
+            <h2>Como usar a Calculadora XTributation</h2>
+            
+            <h3>Dashboard Cambial</h3>
+            <ol>
+                <li><strong>Adicione suas transações:</strong> Informe data, tipo (Envio/Retirada) e valor em USD de cada movimentação de capital.</li>
+                <li><strong>Carregue o arquivo de cotações:</strong> Baixe o arquivo CSV das cotações do dólar do Banco Central e faça o upload.</li>
+                <li><strong>Processe a análise:</strong> Clique em "Processar Análise" para calcular lucros/prejuízos cambiais.</li>
+            </ol>
+            
+            <h3>Dashboard de IR</h3>
+            <ol>
+                <li><strong>Carregue o relatório:</strong> Faça upload do arquivo CSV com suas operações da corretora.</li>
+                <li><strong>Analise os resultados:</strong> Veja o cálculo do imposto devido e prejuízos a compensar.</li>
+            </ol>
+            
+            <h3>Formato dos Arquivos</h3>
+            <p><strong>Cotações:</strong> Arquivo CSV do Banco Central com colunas Data, Cotação Compra, Cotação Venda.</p>
+            <p><strong>Operações:</strong> Arquivo CSV com colunas Data, Ativo, Tipo, Preço, Lucro, Saldo (separado por ponto e vírgula).</p>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        // --- CONFIGURAÇÃO DO FIREBASE ---
         const firebaseConfig = {
           apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
           authDomain: "calculadora-ir-56a2c.firebaseapp.com",
@@ -308,6 +394,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
+        // --- ELEMENTOS DO DOM ---
         const loginScreen = document.getElementById('login-screen');
         const calculatorContent = document.getElementById('calculator-content');
         const authContainer = document.getElementById('auth-container');
@@ -318,7 +405,11 @@
         const signInButton = document.getElementById('sign-in-button');
         const forgotPasswordLink = document.getElementById('forgot-password-link');
         const messageElement = document.getElementById('message');
-        
+        const tutorialOverlay = document.getElementById('tutorial-overlay');
+        const openTutorialButton = document.getElementById('open-tutorial-button');
+        const closeTutorialButton = document.getElementById('close-tutorial');
+
+        // --- LÓGICA DE APRESENTAÇÃO (LAYOUT) ---
         window.addEventListener('mousemove', e => {
             document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
@@ -326,13 +417,18 @@
 
         function initStagger() {
             document.querySelectorAll('.stagger-parent, .content-wrapper').forEach(parent => {
-                parent.querySelectorAll('.stagger-in').forEach((child, i) => child.style.setProperty('--stagger-index', i));
+                parent.querySelectorAll('.stagger-in').forEach((child, i) => {
+                    child.style.setProperty('--stagger-index', i);
+                });
             });
         }
 
+        // --- LÓGICA DE AUTENTICAÇÃO ---
         signInButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
             messageElement.style.display = 'none';
-            signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+            signInWithEmailAndPassword(auth, email, password)
                 .catch(error => {
                     messageElement.textContent = `Erro: E-mail ou senha inválidos.`;
                     messageElement.className = 'message error';
@@ -353,20 +449,19 @@
                 .then(() => {
                     messageElement.textContent = 'E-mail de redefinição enviado!';
                     messageElement.className = 'message success';
-                    messageElement.style.display = 'block';
                 })
                 .catch(error => {
                     messageElement.textContent = `Erro ao enviar e-mail.`;
                     messageElement.className = 'message error';
-                    messageElement.style.display = 'block';
                 });
+            messageElement.style.display = 'block';
         });
 
-        signOutButton.addEventListener('click', () => signOut(auth));
+        signOutButton.addEventListener('click', () => { signOut(auth); });
 
         onAuthStateChanged(auth, (user) => {
-            const loadingOverlay = document.getElementById('loading-overlay');
             if (user) {
+                const loadingOverlay = document.getElementById('loading-overlay');
                 loginScreen.style.display = 'none';
                 loadingOverlay.style.display = 'flex';
                 loadingOverlay.style.opacity = '1';
@@ -383,7 +478,7 @@
                     document.body.style.overflow = 'auto';
 
                     if (!localStorage.getItem('xtributationTutorialSeen')) {
-                        setTimeout(startTour, 700);
+                        setTimeout(() => tutorialOverlay.classList.remove('hidden'), 500);
                     }
                     setTimeout(initStagger, 50);
 
@@ -394,12 +489,607 @@
                 calculatorContent.style.display = 'none';
                 authContainer.style.display = 'none';
                 document.body.style.overflow = 'hidden';
+                
+                const loadingOverlay = document.getElementById('loading-overlay');
                 if (loadingOverlay) {
                     loadingOverlay.style.display = 'none';
                 }
             }
         });
 
+        // --- CONTROLES DO TUTORIAL ---
+        function closeTutorial() {
+            tutorialOverlay.classList.add('hidden');
+            localStorage.setItem('xtributationTutorialSeen', 'true');
+        }
+        openTutorialButton.addEventListener('click', () => tutorialOverlay.classList.remove('hidden'));
+        closeTutorialButton.addEventListener('click', closeTutorial);
+        tutorialOverlay.addEventListener('click', (e) => {
+            if (e.target === tutorialOverlay) {
+                closeTutorial();
+            }
+        });
+
+        // --- LÓGICA PRINCIPAL DA APLICAÇÃO ---
+        window.showMainTab = function(tabName) {
+            document.querySelectorAll('.main-content').forEach(content => content.classList.add('hidden'));
+            document.querySelectorAll('.main-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`main-content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`main-tab-${tabName}`).classList.add('active');
+        }
+
+        let manualTransactions = [];
+        let currentlyEditingIndex = null;
+        let ratesMap = new Map();
+
+        function showLoader(containerId, message = "Processando...") {
+             document.getElementById(containerId).innerHTML = `<div class="flex justify-center items-center p-10"><div class="loader"></div><span class="ml-4 text-gray-400">${message}</span></div>`;
+        }
+        function showError(containerId, message) {
+            document.getElementById(containerId).innerHTML = `<div class="bg-negative-color bg-opacity-20 border border-negative-color text-text-white p-4 rounded-md" role="alert"><p class="font-bold">ERRO</p><p>${message}</p></div>`;
+        }
+        function formatCurrency(value, currency = 'BRL', digits = 2) {
+            if (typeof value !== 'number' || isNaN(value)) return formatCurrency(0, currency, digits);
+            return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', { style: 'currency', currency: currency, minimumFractionDigits: digits }).format(value);
+        }
+
+        function formatCurrencyWithColor(value) {
+            const formattedValue = formatCurrency(value, 'BRL');
+            if (value > 0) return `<span class="text-positive font-semibold">${formattedValue}</span>`;
+            if (value < 0) return `<span class="text-negative font-semibold">${formattedValue}</span>`;
+            return `<span>${formattedValue}</span>`;
+        }
+        
+        function getRateForDate(date) {
+            if (ratesMap.size === 0) return null;
+            let currentDate = new Date(date);
+            for (let i = 0; i < 7; i++) {
+                const lookupDateStr = currentDate.toISOString().split('T')[0];
+                if (ratesMap.has(lookupDateStr)) return ratesMap.get(lookupDateStr);
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+            return null;
+        }
+
+        window.toggleNaoRetirada = function() {
+            const dateInput = document.getElementById('trans-date');
+            const naoRetiradaOption = document.getElementById('nao-retirada-option');
+            const typeSelect = document.getElementById('trans-type');
+            const alocarCard = document.getElementById('alocar-proximo-ano-card');
+
+            const dateValue = dateInput.value;
+            if (dateValue && dateValue.substring(5) === '12-31') {
+                naoRetiradaOption.disabled = false;
+                alocarCard.classList.remove('hidden');
+            } else {
+                naoRetiradaOption.disabled = true;
+                alocarCard.classList.add('hidden');
+                if (typeSelect.value === 'NaoRetirada') {
+                    typeSelect.value = 'Envio';
+                }
+            }
+        }
+        document.getElementById('trans-date').addEventListener('change', toggleNaoRetirada);
+        toggleNaoRetirada();
+
+        // FUNÇÃO DE SALVAR TRANSAÇÃO ATUALIZADA
+        window.handleSaveTransaction = function() {
+            const dateInput = document.getElementById('trans-date');
+            const typeInput = document.getElementById('trans-type');
+            const valueInput = document.getElementById('trans-value');
+
+            // Nova lógica para aceitar o formato 1.000,00
+            const sanitizedValue = valueInput.value.replace(/\./g, '').replace(',', '.');
+            const numericValue = parseFloat(sanitizedValue);
+
+            if (!dateInput.value || isNaN(numericValue) || numericValue <= 0) {
+                alert('Por favor, preencha a data e um valor positivo válido no formato 1.000,00.');
+                return;
+            }
+
+            const transactionData = { date: new Date(`${dateInput.value}T00:00:00Z`), type: typeInput.value, value: numericValue };
+            
+            if (currentlyEditingIndex !== null) {
+                if (currentlyEditingIndex === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'NaoRetirada')) {
+                    alert('O primeiro lançamento não pode ser editado para "Retirada" ou "Não Retirada".');
+                    return;
+                }
+                manualTransactions[currentlyEditingIndex] = transactionData;
+            } else {
+                if (manualTransactions.length === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'NaoRetirada')) {
+                    alert('O primeiro lançamento deve ser obrigatoriamente um ENVIO.');
+                    return;
+                }
+                manualTransactions.push(transactionData);
+            }
+            manualTransactions.sort((a, b) => a.date - b.date);
+            renderTransactionsTable();
+            cancelEdit();
+        }
+        
+        window.editTransaction = function(index) {
+            currentlyEditingIndex = index;
+            const trans = manualTransactions[index];
+            document.getElementById('trans-date').value = trans.date.toISOString().split('T')[0];
+            document.getElementById('trans-type').value = trans.type;
+            
+            // Formata o valor de volta para o padrão brasileiro ao editar
+            document.getElementById('trans-value').value = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(trans.value);
+
+            document.getElementById('add-trans-button').textContent = 'Salvar Alterações';
+            document.getElementById('cancel-edit-button').classList.remove('hidden');
+            toggleNaoRetirada();
+        }
+        
+        window.cancelEdit = function() {
+            currentlyEditingIndex = null;
+            document.getElementById('trans-date').value = '';
+            document.getElementById('trans-type').value = 'Envio';
+            document.getElementById('trans-value').value = '';
+            document.getElementById('add-trans-button').textContent = 'Adicionar +';
+            document.getElementById('cancel-edit-button').classList.add('hidden');
+            toggleNaoRetirada();
+        }
+
+        window.removeTransaction = function(index) { 
+            if (confirm('Tem certeza que deseja remover esta transação?')) {
+                manualTransactions.splice(index, 1); 
+                renderTransactionsTable(); 
+            }
+        }
+        
+        function renderTransactionsTable() {
+            const container = document.getElementById('transactions-list');
+            if (manualTransactions.length === 0) { container.innerHTML = ''; return; }
+            const headers = ['Data', 'Tipo', 'Valor (USD)', 'Cotação (R$)', 'Total (R$)', 'Ações'];
+            const data = manualTransactions.map((t, index) => {
+                const cotacaoDia = getRateForDate(t.date);
+                const cotacaoDisplay = cotacaoDia ? formatCurrency(cotacaoDia, 'BRL') : `<span class="text-xs text-gray-500">Aguardando arquivo</span>`;
+                const totalBRL = cotacaoDia ? t.value * cotacaoDia : null;
+                const totalBRLDisplay = totalBRL !== null ? formatCurrency(totalBRL, 'BRL') : `<span class="text-xs text-gray-500">---</span>`;
+                const actions = `<div class="flex gap-2"><button onclick="editTransaction(${index})" class="text-warning hover:text-white font-semibold text-xs uppercase">Editar</button><button onclick="removeTransaction(${index})" class="text-negative-color hover:text-white font-semibold text-xs uppercase">Remover</button></div>`;
+                return [t.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'}), t.type, formatCurrency(t.value, 'USD'), cotacaoDisplay, totalBRLDisplay, actions];
+            });
+            let table = `<h4 class="text-md font-semibold mb-2 mt-4 border-t border-border-color pt-4 text-content-strong">Transações a Processar:</h4><div class="overflow-x-auto bg-main-bg rounded-md border border-border-color max-h-64"><table class="min-w-full text-sm"><thead><tr class="bg-card-bg">`;
+            headers.forEach(h => table += `<th class="text-left py-2 px-3 font-medium text-gray-400 uppercase tracking-wider">${h}</th>`);
+            table += `</tr></thead><tbody class="divide-y divide-border-color">`;
+            data.forEach(row => { table += `<tr class="hover:bg-card-bg">`; row.forEach(cell => table += `<td class="py-2 px-3 whitespace-nowrap">${cell}</td>`); table += `</tr>`; });
+            table += `</tbody></table></div>`;
+            container.innerHTML = table;
+        }
+        
+        function parseFile(file) { return new Promise((resolve, reject) => { if (!file) return reject(new Error("Arquivo não fornecido.")); Papa.parse(file, { skipEmptyLines: true, complete: results => resolve(results.data), error: error => reject(error) }); }); }
+        
+        async function handleRatesFileChange(event) {
+            const ratesFile = event.target.files[0];
+            if (!ratesFile) return;
+            try {
+                const ratesData = await parseFile(ratesFile);
+                ratesMap.clear();
+                ratesData.slice(2).forEach(row => {
+                    if (row.length < 3) return;
+                    const [dateStr, , rateStr] = row; if (!dateStr || !rateStr) return;
+                    const dateParts = dateStr.split('/'); if (dateParts.length !== 3) return;
+                    const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00Z`);
+                    const rate = parseFloat(String(rateStr).replace('R$ ', '').replace(',', '.'));
+                    if (!isNaN(date.getTime()) && !isNaN(rate)) ratesMap.set(date.toISOString().split('T')[0], rate);
+                });
+                renderTransactionsTable();
+            } catch (error) {
+                console.error("Error parsing rates file:", error);
+                showError('results-area-cambial', `Erro ao ler o arquivo de cotações: ${error.message}`);
+            }
+        }
+        document.getElementById('rates-file').addEventListener('change', handleRatesFileChange);
+
+        window.handleProcessCambial = async function() {
+            showLoader('results-area-cambial');
+            if (ratesMap.size === 0) { showError('results-area-cambial', 'O arquivo de cotações é obrigatório.'); return; }
+            if (manualTransactions.length === 0) { showError('results-area-cambial', 'Nenhuma transação manual foi adicionada.'); return; }
+            try {
+                processAndRenderCambial(manualTransactions);
+            } catch (error) { showError('results-area-cambial', `Ocorreu um erro: ${error.message}`); }
+        }
+
+        function processAndRenderCambial(transactions) {
+            try {
+                let saldoUSD = 0, custoSaldoBRL = 0, totalEnviosUSD = 0, totalRetiradoUSD = 0, lucroPrejuizoTotal = 0, valorParaAlocar = 0;
+                const detailedData = [], exportData = [];
+                const exportHeaders = ['Data', 'Tipo', 'Valor (USD)', 'Cotação (R$)', 'Valor de Mercado (R$)', 'Custo da Operação (R$)', 'Lucro/Prejuízo (R$)', 'Saldo Final (USD)'];
+
+                for (const trans of transactions) {
+                    const cotacaoDia = getRateForDate(trans.date);
+                    if (cotacaoDia === null) throw new Error(`Cotação não encontrada para a data ${trans.date.toLocaleDateString('pt-BR', {timeZone:'UTC'})}.`);
+                    
+                    const valorDeMercadoBRL = trans.value * cotacaoDia;
+                    const precoMedioAnterior = saldoUSD > 1e-6 ? custoSaldoBRL / saldoUSD : 0;
+                    let custoOperacaoBRL = 0, lucroPrejuizoRow = 0;
+                    
+                    if (trans.type === 'Envio') {
+                        saldoUSD += trans.value;
+                        custoSaldoBRL += valorDeMercadoBRL;
+                        totalEnviosUSD += trans.value;
+                        custoOperacaoBRL = valorDeMercadoBRL;
+                    } else { // Retirada ou NaoRetirada
+                        if (trans.value > saldoUSD) throw new Error(`Saque (${formatCurrency(trans.value, 'USD')}) maior que o saldo na data.`);
+                        if (trans.type === 'Retirada') totalRetiradoUSD += trans.value;
+                        custoOperacaoBRL = trans.value * precoMedioAnterior;
+                        lucroPrejuizoRow = valorDeMercadoBRL - custoOperacaoBRL;
+                        lucroPrejuizoTotal += lucroPrejuizoRow;
+                        saldoUSD -= trans.value;
+                        custoSaldoBRL -= custoOperacaoBRL;
+                        if (trans.type === 'NaoRetirada') valorParaAlocar += lucroPrejuizoRow;
+                    }
+
+                    const dateLabel = trans.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+                    detailedData.push([dateLabel, trans.type, formatCurrency(trans.value, 'USD'), formatCurrency(cotacaoDia, 'BRL'), formatCurrency(valorDeMercadoBRL, 'BRL'), formatCurrency(custoOperacaoBRL, 'BRL'), formatCurrencyWithColor(lucroPrejuizoRow), formatCurrency(saldoUSD, 'USD')]);
+                    exportData.push([dateLabel, trans.type, trans.value, cotacaoDia, valorDeMercadoBRL, custoOperacaoBRL, lucroPrejuizoRow, saldoUSD]);
+                }
+
+                if (valorParaAlocar > 0) {
+                    document.getElementById('alocar-proximo-ano-valor').textContent = formatCurrency(valorParaAlocar);
+                    document.getElementById('alocar-proximo-ano-card').classList.remove('hidden');
+                } else {
+                    document.getElementById('alocar-proximo-ano-card').classList.add('hidden');
+                }
+
+                const kpiData = { lucroPrejuizoTotal, saldoUSD, custoSaldoBRL, totalEnviosUSD, totalRetiradoUSD };
+                const lucroColor = kpiData.lucroPrejuizoTotal > 0 ? 'text-positive' : kpiData.lucroPrejuizoTotal < 0 ? 'text-negative' : 'text-white';
+                
+                const resultsContainer = document.getElementById('results-area-cambial');
+                resultsContainer.innerHTML = `
+                    <div id="pdf-export-area">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold text-header">Resultados da Análise Cambial</h2>
+                            <div id="export-buttons" class="flex gap-4">
+                                <button id="export-csv-button" class="btn btn-secondary text-sm">Exportar Excel (.csv)</button>
+                                <button id="export-pdf-button" class="btn btn-secondary text-sm">Exportar PDF</button>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="kpi-card p-6 text-center">
+                                <p class="text-sm font-medium text-gray-400">LUCRO / PREJUÍZO TOTAL NA OPERAÇÃO</p>
+                                <p class="text-4xl font-bold ${lucroColor} mt-2">${formatCurrency(kpiData.lucroPrejuizoTotal)}</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div class="kpi-card"><p class="text-sm font-medium text-gray-400">Total Enviado (USD)</p><p class="text-2xl font-bold text-header">${formatCurrency(kpiData.totalEnviosUSD, 'USD')}</p></div>
+                                <div class="kpi-card"><p class="text-sm font-medium text-gray-400">Total Retirado (USD)</p><p class="text-2xl font-bold text-header">${formatCurrency(kpiData.totalRetiradoUSD, 'USD')}</p></div>
+                                <div class="kpi-card"><p class="text-sm font-medium text-gray-400">Saldo Atual (USD)</p><p class="text-2xl font-bold text-accent-color">${formatCurrency(kpiData.saldoUSD, 'USD')}</p></div>
+                                <div class="kpi-card"><p class="text-sm font-medium text-gray-400">Custo do Saldo (BRL)</p><p class="text-2xl font-bold text-header">${formatCurrency(kpiData.custoSaldoBRL)}</p></div>
+                            </div>
+                            <div class="card p-6">
+                                <h3 class="text-xl font-bold text-content-strong mb-4">Extrato Detalhado</h3>
+                                ${createSimpleTable(['Data', 'Tipo', 'Valor (USD)', 'Mercado (R$)', 'Custo (R$)', 'Lucro/Prej. (R$)', 'Saldo (USD)'], detailedData)}
+                            </div>
+                        </div>
+                    </div>`;
+
+                document.getElementById('export-csv-button').addEventListener('click', () => exportToCSV(exportHeaders, exportData, kpiData));
+                document.getElementById('export-pdf-button').addEventListener('click', () => {
+                    const buttons = document.getElementById('export-buttons');
+                    buttons.style.visibility = 'hidden';
+                    window.print();
+                    buttons.style.visibility = 'visible';
+                });
+
+            } catch (e) { showError('results-area-cambial', `Ocorreu um erro crítico no processamento: ${e.message}`); console.error(e); }
+        }
+
+        function createSimpleTable(headers, data) {
+            let table = '<div class="overflow-x-auto"><table class="min-w-full">';
+            table += `<thead class="border-b border-border-color-glass"><tr>`;
+            headers.forEach(header => table += `<th class="text-left py-3 px-4 font-semibold text-sm text-gray-400 uppercase tracking-wider">${header}</th>`);
+            table += '</tr></thead><tbody class="text-primary divide-y divide-border-color-glass">';
+            data.forEach(row => { table += `<tr class="hover:bg-main-bg/50">`; row.forEach(cell => table += `<td class="py-4 px-4 whitespace-nowrap text-sm">${cell}</td>`); table += `</tr>`; });
+            table += '</tbody></table></div>';
+            return table;
+        }
+
+        function exportToCSV(headers, data, kpis) {
+            const kpiRows = [
+                ["Resumo da Análise Cambial"],
+                ["Lucro/Prejuízo Total (R$)", kpis.lucroPrejuizoTotal],
+                ["Total Enviado (USD)", kpis.totalEnviosUSD],
+                ["Total Retirado (USD)", kpis.totalRetiradoUSD],
+                ["Saldo Atual (USD)", kpis.saldoUSD],
+                ["Custo do Saldo (R$)", kpis.custoSaldoBRL],
+                []
+            ];
+            const tableRows = [headers, ...data];
+            const allRows = [...kpiRows, ...tableRows];
+            let csvContent = "data:text/csv;charset=utf-8," + allRows.map(e => e.join(";")).join("\n");
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "relatorio_cambial.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // --- Lógica do Imposto de Renda ---
+        document.getElementById('operations-file').addEventListener('change', handleFileSelectIR);
+        function showLoaderIR() { document.getElementById('results-area-ir').innerHTML = `<div class="fade-in flex justify-center p-10"><div class="loader"></div></div>`; }
+        function showErrorIR(message, rawDataPreview = '') { let d = rawDataPreview ? `<pre class="mt-4 text-xs bg-gray-900 p-2 rounded-md overflow-x-auto">LOG DE DADOS: \n${rawDataPreview}</pre>` : ''; document.getElementById('results-area-ir').innerHTML = `<div class="fade-in bg-negative-color bg-opacity-20 border border-negative-color text-text-white p-4 rounded-md" role="alert"><p class="font-bold">ERRO NA ANÁLISE</p><p>${message}</p>${d}</div>`; }
+        function formatCurrencyIR(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(isNaN(parseFloat(value)) ? 0 : value); }
+        window.showTabIR = function(tabName) { ['imposto', 'operacoes'].forEach(name => { document.getElementById(`tab-btn-${name}`)?.classList.remove('active', 'main-tab-button'); document.getElementById(`tab-btn-${name}`)?.classList.add('main-tab-button'); document.getElementById(`tab-content-${name}`)?.classList.add('hidden'); }); document.getElementById(`tab-btn-${tabName}`)?.classList.add('active'); document.getElementById(`tab-content-${tabName}`)?.classList.remove('hidden'); }
+        function handleFileSelectIR(event) {
+            const file = event.target.files[0];
+            document.getElementById('file-label').textContent = file ? file.name : 'Selecione o arquivo'; if (!file) return;
+            showLoaderIR();
+            Papa.parse(file, { delimiter: ';', skipEmptyLines: true, complete: (results) => { try { renderDashboardIR(processFileDataIR(results.data)); } catch (e) { showErrorIR(e.message, results.data.slice(0, 5).map(r => r.join(';')).join('\n')); } } });
+        }
+        function processFileDataIR(allRows) {
+            function excelSerialDateToJSDate(serial) { const utc_days  = Math.floor(serial - 25569); const utc_value = utc_days * 86400; const date_info = new Date(utc_value * 1000); return new Date(date_info.getTime() + (date_info.getTimezoneOffset() * 60 * 1000)); }
+            const normalize = (str) => typeof str === 'string' ? str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+            const HEADER_KEYWORDS = { data: 'data', ativo: 'ativo', tipo: 'tipo', preco: 'preco', lucro: 'lucro', saldo: 'saldo' };
+            let headerRowIndex = allRows.findIndex(row => ['data', 'tipo', 'lucro', 'saldo', 'ativo'].filter(kw => row.map(normalize).includes(kw)).length >= 4);
+            if (headerRowIndex === -1) throw new Error("Cabeçalho não encontrado. Verifique se as colunas 'Data', 'Ativo', 'Tipo', 'Lucro' e 'Saldo' existem.");
+            const headerRow = allRows[headerRowIndex].map(normalize);
+            const columnMapping = Object.fromEntries(Object.keys(HEADER_KEYWORDS).map(key => [key, headerRow.indexOf(HEADER_KEYWORDS[key])]));
+            const allOps = allRows.slice(headerRowIndex + 1).map(op => {
+                if(op.length < headerRow.length) return null;
+                const dateValue = op[columnMapping.data]; let operationDate = null; if (!dateValue) return null;
+                if (String(dateValue).includes('/')) { const dateParts = String(dateValue).split(' ')[0].split('/'); if (dateParts.length === 3) { operationDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); } } else { const serial = parseFloat(String(dateValue).replace(',', '.')); if (!isNaN(serial)) { operationDate = excelSerialDateToJSDate(serial); } }
+                if (!operationDate || isNaN(operationDate.getTime())) return null;
+                const netProfit = parseFloat(String(op[columnMapping.lucro]).replace(',', '.')) || 0;
+                return { date: operationDate, ativo: String(op[columnMapping.ativo]), tipo: String(op[columnMapping.tipo]).trim().toLowerCase(), preco: parseFloat(String(op[columnMapping.preco]).replace(',', '.')) || 0, netProfit: netProfit, saldo: parseFloat(String(op[columnMapping.saldo]).replace(',', '.')) || 0 };
+            }).filter(Boolean);
+            if (allOps.length === 0) throw new Error("Nenhuma operação válida encontrada.");
+            const totalNetProfit = allOps.reduce((sum, op) => op.tipo !== 'balance' ? sum + op.netProfit : sum, 0);
+            const buysByDay = allOps.reduce((acc, op) => { if (op.tipo === 'buy') { const key = op.date.toISOString().split('T')[0]; (acc[key] = acc[key] || new Set()).add(op.ativo); } return acc; }, {});
+            const salesOpsForTax = allOps.filter(op => op.tipo === 'sell' && op.netProfit !== 0).map(op => ({ ...op, opType: (buysByDay[op.date.toISOString().split('T')[0]]?.has(op.ativo)) ? 'Day Trade' : 'Swing Trade' }));
+            const monthlyData = salesOpsForTax.reduce((acc, op) => {
+                const monthKey = `${op.date.getFullYear()}-${String(op.date.getMonth() + 1).padStart(2, '0')}`;
+                acc[monthKey] = acc[monthKey] || { swingSales: 0, swingGains: 0, swingLosses: 0, dtGains: 0, dtLosses: 0 };
+                if (op.opType === 'Swing Trade') { acc[monthKey].swingSales += op.preco; (op.netProfit > 0) ? acc[monthKey].swingGains += op.netProfit : acc[monthKey].swingLosses += Math.abs(op.netProfit); } else { (op.netProfit > 0) ? acc[monthKey].dtGains += op.netProfit : acc[monthKey].dtLosses += Math.abs(op.netProfit); }
+                return acc;
+            }, {});
+            let lossToCarrySwing = 0, lossToCarryDT = 0, totalTaxDue = 0;
+            const taxReport = Object.keys(monthlyData).sort().map(monthKey => {
+                const m = monthlyData[monthKey]; const swingResult = m.swingGains - m.swingLosses; const dtResult = m.dtGains - m.dtLosses;
+                let dtTaxBase = 0, dtTaxDue = 0, swingTaxBase = 0, swingTaxDue = 0;
+                if (dtResult > 0) { const d = Math.min(dtResult, lossToCarryDT); dtTaxBase = dtResult - d; lossToCarryDT -= d; } else { lossToCarryDT += Math.abs(dtResult); }
+                dtTaxDue = dtTaxBase * 0.20;
+                if (m.swingSales >= 35000.00) { if (swingResult > 0) { const d = Math.min(swingResult, lossToCarrySwing); swingTaxBase = swingResult - d; lossToCarrySwing -= d; } else { lossToCarrySwing += Math.abs(swingResult); } swingTaxDue = swingTaxBase * 0.15; } else if (swingResult < 0) { lossToCarrySwing += Math.abs(swingResult); }
+                totalTaxDue += dtTaxDue + swingTaxDue;
+                return { month: monthKey, ...m, swingResult, dtResult, dtTaxDue, swingTaxDue };
+            });
+            return { allOps, taxReport, kpis: { totalNetProfit, totalTaxDue, finalLossToCarryDT: lossToCarryDT, finalLossToCarrySwing: lossToCarrySwing } };
+        }
+        function renderDashboardIR(data) {
+            const { allOps, taxReport, kpis } = data;
+            const profitColor = kpis.totalNetProfit > 0 ? 'text-positive' : kpis.totalNetProfit < 0 ? 'text-negative' : 'text-white';
+            const kpiHtml = `<h3 class="text-xl font-bold text-content-strong mb-4 uppercase">Resumo Geral</h3><div class="space-y-4"><div class="kpi-card"><p class="text-sm font-medium text-gray-400">Resultado Líquido Total</p><p class="text-3xl font-bold ${profitColor}">${formatCurrencyIR(kpis.totalNetProfit)}</p></div><div class="kpi-card"><p class="text-sm font-medium text-gray-400">Total de Imposto Devido</p><p class="text-3xl font-bold text-accent-color">${formatCurrencyIR(kpis.totalTaxDue)}</p></div><div class="kpi-card"><p class="text-sm font-medium text-gray-400">Prejuízo a Compensar</p><p class="text-md font-bold text-orange-400">Day Trade: ${formatCurrencyIR(kpis.finalLossToCarryDT)}</p><p class="text-md font-bold text-orange-400">Swing Trade: ${formatCurrencyIR(kpis.finalLossToCarrySwing)}</p></div></div>`;
+            const mainContentHtml = `<div class="border-b border-border-color"><nav class="-mb-px flex space-x-2"><button class="main-tab-button" id="tab-btn-imposto" onclick="showTabIR('imposto')">APURAÇÃO DE IMPOSTO</button><button class="main-tab-button" id="tab-btn-operacoes" onclick="showTabIR('operacoes')">HISTÓRICO DE OPERAÇÕES</button></nav></div><div id="tab-content-imposto" class="mt-6"></div><div id="tab-content-operacoes" class="hidden mt-6"></div>`;
+            document.getElementById('results-area-ir').innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-4 gap-8"><aside class="lg:col-span-1 fade-in">${kpiHtml}</aside><main class="lg:col-span-3 fade-in" style="animation-delay: 0.1s;">${mainContentHtml}</main></div>`;
+            renderOperacoesViewIR(allOps); renderImpostoViewIR(taxReport); showTabIR('imposto');
+        }
+        function renderOperacoesViewIR(allOps) {
+            document.getElementById('tab-content-operacoes').innerHTML = `<div class="card p-4"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-content-strong">Todas as ${allOps.length} Operações</h3><input type="text" id="ops-search" placeholder="Buscar..." onkeyup="filterTableIR('ops-table', 'ops-search')" class="input-field w-1/3"></div><div id="ops-table" class="overflow-y-auto max-h-[60vh]">${createSimpleTable(['Data', 'Ativo', 'Tipo', 'Resultado Líquido', 'Saldo'], allOps.map(op => [op.date.toLocaleDateString('pt-BR'), op.ativo, `<span class="px-2 py-1 text-xs font-semibold rounded-sm ${op.tipo === 'sell' ? 'bg-negative-color bg-opacity-30 text-white' : (op.tipo === 'buy' ? 'bg-accent-color bg-opacity-30 text-white' : 'bg-gray-700 text-gray-300')}">${op.tipo}</span>`, formatCurrencyWithColor(op.netProfit), formatCurrencyIR(op.saldo)]))}</div></div>`;
+        }
+        function renderImpostoViewIR(taxReport) {
+            const chartHtml = `<div class="card mb-8 p-4"><h3 class="text-lg font-semibold mb-4 text-center text-content-strong">Imposto Devido (DARF) por Mês</h3><canvas id="monthlyTaxChart"></canvas></div>`;
+            let tableHtml = `<div class="card p-4"><h3 class="text-xl font-bold mb-4 text-content-strong">Apuração Mensal</h3><div class="overflow-x-auto">${createSimpleTable(['Mês', 'Res. Day Trade', 'Res. Swing', 'Vendas Swing', 'Imposto Total'], taxReport.map(row => { const isExempt = row.swingSales < 35000; return [`<span class="font-semibold">${row.month.split('-').reverse().join('/')}</span>`, `<span class="font-semibold ${row.dtResult > 0 ? 'text-positive' : row.dtResult < 0 ? 'text-negative' : ''}">${formatCurrencyIR(row.dtResult)}</span>`, `<span class="font-semibold ${row.swingResult > 0 ? 'text-positive' : row.swingResult < 0 ? 'text-negative' : ''}">${formatCurrencyIR(row.swingResult)}</span>`, `<span class="text-sm ${isExempt ? 'text-gray-500' : 'text-white'}">${formatCurrencyIR(row.swingSales)}${isExempt ? ' (Isento)' : ''}</span>`, `<span class="font-bold text-accent-color">${formatCurrencyIR(row.dtTaxDue + row.swingTaxDue)}</span>`]; }))}</div></div>`;
+            document.getElementById('tab-content-imposto').innerHTML = chartHtml + tableHtml;
+            const ctx = document.getElementById('monthlyTaxChart').getContext('2d');
+            new Chart(ctx, { type: 'bar', data: { labels: taxReport.map(r => r.month.split('-').reverse().join('/')), datasets: [{ label: 'Imposto Devido (R$)', data: taxReport.map(r => r.dtTaxDue + r.swingTaxDue), backgroundColor: 'rgba(88, 166, 255, 0.6)', borderColor: 'rgba(88, 166, 255, 1)', borderWidth: 1 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#C9D1D9' } } }, scales: { y: { beginAtZero: true, ticks: { color: '#8B949E', callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); } }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }, x: { ticks: { color: '#8B949E' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } } } } });
+        }
+        window.filterTableIR = function(tableId, searchId) {
+            const filter = document.getElementById(searchId).value.toLowerCase();
+            const table = document.getElementById(tableId);
+            const tableBody = table.querySelector('tbody');
+            if (tableBody) { tableBody.querySelectorAll('tr').forEach(row => { row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none'; }); }
+        }
+
+        // --- LÓGICA DO TOUR INTERATIVO ---
+        const tourOverlay = document.getElementById('tour-overlay');
+        const tourHighlight = document.querySelector('.tour-highlight');
+        const tourTooltip = document.querySelector('.tour-tooltip');
+        const tourTitle = document.getElementById('tour-title');
+        const tourText = document.getElementById('tour-text');
+        const tourStepCounter = document.getElementById('tour-step-counter');
+        const tourPrevBtn = document.getElementById('tour-prev-btn');
+        const tourNextBtn = document.getElementById('tour-next-btn');
+        const tourSkipBtn = document.getElementById('tour-skip-btn');
+
+        const tourSteps = [
+            { element: '#tour-step-1', title: 'Navegação Principal', intro: 'Alterne entre os dashboards para suas análises.' },
+            { element: '#tour-step-2', title: 'Adicionar Transações', intro: 'Preencha os dados de suas movimentações de capital.' },
+            { element: '#tour-step-3', title: 'Carregar Cotações', intro: 'Importe o arquivo CSV para os cálculos de conversão.' },
+            { element: '#tour-step-4', title: 'Processar Análise', intro: 'Clique aqui para executar os cálculos após preencher os dados.' },
+            { element: '#main-tab-ir', title: 'Análise de IR', intro: 'Mude para este dashboard para analisar o imposto sobre suas operações.' },
+            { element: '#tour-step-5', title: 'Relatório de Operações', intro: 'Importe seu relatório da corretora para o cálculo do IR.' }
+        ];
+
+        let currentStep = 0;
+        function startTour() { currentStep = 0; tourOverlay.style.display = 'block'; setTimeout(() => showStep(currentStep), 50); localStorage.setItem('xtributationTutorialSeen', 'true'); }
+        function endTour() { tourOverlay.classList.remove('active'); setTimeout(() => tourOverlay.style.display = 'none', 300); }
+        function showStep(index) {
+            const step = tourSteps[index];
+            const targetElement = document.querySelector(step.element);
+            if (!targetElement) { endTour(); return; }
+
+            const parentContent = targetElement.closest('.main-content');
+            if (parentContent && parentContent.id.includes('ir')) { showMainTab('ir'); } 
+            else { showMainTab('cambial'); }
+            
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            
+            setTimeout(() => {
+                const rect = targetElement.getBoundingClientRect();
+                tourHighlight.style.width = `${rect.width + 12}px`;
+                tourHighlight.style.height = `${rect.height + 12}px`;
+                tourHighlight.style.top = `${rect.top - 6}px`;
+                tourHighlight.style.left = `${rect.left - 6}px`;
+
+                const tooltipX = Math.min(rect.right + 20, window.innerWidth - 340);
+                const tooltipY = Math.max(20, rect.top - 50);
+                tourTooltip.style.left = `${tooltipX}px`;
+                tourTooltip.style.top = `${tooltipY}px`;
+
+                tourTitle.textContent = step.title;
+                tourText.textContent = step.intro;
+                tourStepCounter.textContent = `${index + 1} de ${tourSteps.length}`;
+
+                tourPrevBtn.style.display = index === 0 ? 'none' : 'inline-flex';
+                tourNextBtn.textContent = index === tourSteps.length - 1 ? 'Finalizar' : 'Próximo';
+
+                tourOverlay.classList.add('active');
+            }, 300);
+        }
+
+        tourPrevBtn.addEventListener('click', () => { if (currentStep > 0) { currentStep--; showStep(currentStep); } });
+        tourNextBtn.addEventListener('click', () => { if (currentStep < tourSteps.length - 1) { currentStep++; showStep(currentStep); } else { endTour(); } });
+        tourSkipBtn.addEventListener('click', endTour);
+        tourOverlay.addEventListener('click', (e) => { if (e.target === tourOverlay) endTour(); });
+
+    </script>
+</body>
+</html>
+    <div id="tour-overlay" style="display: none;">
+        <div class="tour-highlight"></div>
+        <div class="tour-tooltip">
+             <h3 id="tour-title" class="text-xl font-bold mb-2 text-white"></h3>
+             <p id="tour-text" class="text-base mb-4 text-text-primary"></p>
+             <div class="tour-nav">
+                 <button id="tour-skip-btn" class="text-sm text-text-primary hover:text-white">Pular</button>
+                 <div class="flex items-center gap-3">
+                     <span id="tour-step-counter" class="text-sm text-text-primary"></span>
+                     <button id="tour-prev-btn" class="btn btn-secondary text-xs">Anterior</button>
+                     <button id="tour-next-btn" class="btn btn-primary text-xs">Próximo</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // --- CONFIGURAÇÃO DO FIREBASE ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
+          authDomain: "calculadora-ir-56a2c.firebaseapp.com",
+          projectId: "calculadora-ir-56a2c",
+          storageBucket: "calculadora-ir-56a2c.appspot.com",
+          messagingSenderId: "613402077853",
+          appId: "1:613402077853:web:244d838cc2a99452288274"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // --- ELEMENTOS DO DOM ---
+        const loginScreen = document.getElementById("login-screen");
+        const calculatorContent = document.getElementById("calculator-content");
+        const authContainer = document.getElementById("auth-container");
+        const userEmailDisplay = document.getElementById("user-email");
+        const signOutButton = document.getElementById("sign-out-button");
+        const emailInput = document.getElementById("email-input");
+        const passwordInput = document.getElementById("password-input");
+        const signInButton = document.getElementById("sign-in-button");
+        const forgotPasswordLink = document.getElementById("forgot-password-link");
+        const messageElement = document.getElementById("message");
+
+        // --- FUNÇÕES HELPER GLOBAIS ---
+        function showLoader(containerId, message = "Processando...") {
+            const container = document.getElementById(containerId);
+            if(container) container.innerHTML = `<div class="flex justify-center items-center p-10"><div class="loader"></div><span class="ml-4 text-text-primary">${message}</span></div>`;
+        }
+        function showError(containerId, message, rawDataPreview = "") {
+            const container = document.getElementById(containerId);
+            if(container) {
+                let details = rawDataPreview ? `<pre class="mt-4 text-xs bg-black bg-opacity-25 p-2 rounded overflow-x-auto">Preview dos dados lidos:\n${rawDataPreview}</pre>` : "";
+                container.innerHTML = `<div class="bg-negative-color bg-opacity-20 border border-negative-color text-text-white p-4 rounded-md" role="alert"><p class="font-bold">ERRO</p><p>${message}</p>${details}</div>`;
+            }
+        }
+        function formatCurrency(value, currency = "BRL", digits = 2) {
+            if (typeof value !== "number" || isNaN(value)) return formatCurrency(0, currency, digits);
+            return new Intl.NumberFormat(currency === "BRL" ? "pt-BR" : "en-US", { style: "currency", currency: currency, minimumFractionDigits: digits }).format(value);
+        }
+        function formatCurrencyIR(value) { 
+            return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(isNaN(parseFloat(value)) ? 0 : value); 
+        }
+        function formatCurrencyWithColor(value) {
+            const formattedValue = formatCurrencyIR(value);
+            if (value > 0) return `<span class="text-positive font-semibold">${formattedValue}</span>`;
+            if (value < 0) return `<span class="text-negative font-semibold">${formattedValue}</span>`;
+            return `<span>${formattedValue}</span>`;
+        }
+        function createSimpleTable(headers, data) {
+            let table = '<div class="overflow-x-auto"><table class="min-w-full text-sm">';
+            table += `<thead class="border-b border-border-color"><tr>`;
+            headers.forEach(header => table += `<th class="text-left py-3 px-4 font-semibold text-text-primary uppercase tracking-wider">${header}</th>`);
+            table += '</tr></thead><tbody class="divide-y divide-border-color">';
+            data.forEach(row => {
+                table += `<tr class="hover:bg-card-bg">`;
+                row.forEach(cell => table += `<td class="py-3 px-4 whitespace-nowrap">${cell}</td>`);
+                table += `</tr>`;
+            });
+            table += '</tbody></table></div>';
+            return table;
+        }
+
+        // --- LÓGICA DE APRESENTAÇÃO (LAYOUT) ---
+        window.addEventListener('mousemove', e => {
+            document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+
+        function initStagger() {
+            document.querySelectorAll('.stagger-parent, .content-wrapper').forEach(parent => {
+                parent.querySelectorAll('.stagger-in').forEach((child, i) => {
+                    child.style.setProperty('--stagger-index', i);
+                });
+            });
+        }
+
+        // --- LÓGICA DE AUTENTICAÇÃO ---
+        function showMessage(msg, type = 'error') {
+            messageElement.textContent = msg;
+            messageElement.className = `message ${type}`;
+            messageElement.style.display = 'block';
+        }
+        
+        signInButton.addEventListener('click', () => {
+            messageElement.style.display = 'none';
+            signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+                .catch(err => showMessage("Erro: Verifique seu e-mail e senha."));
+        });
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            if (!email) {
+                showMessage('Por favor, insira seu e-mail para redefinir a senha.');
+                return;
+            }
+            sendPasswordResetEmail(auth, email)
+                .then(() => showMessage('E-mail de redefinição enviado!', 'success'))
+                .catch(err => showMessage('Erro ao enviar e-mail de redefinição.'));
+        });
+
+        signOutButton.addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, user => {
+            const isUserLoggedIn = !!user;
+            loginScreen.style.display = isUserLoggedIn ? 'none' : 'flex';
+            calculatorContent.style.display = isUserLoggedIn ? 'block' : 'none';
+            authContainer.style.display = isUserLoggedIn ? 'flex' : 'none';
+            
+            if (isUserLoggedIn) {
+                userEmailDisplay.textContent = user.email;
+                document.body.style.overflow = 'auto';
+                if (!localStorage.getItem('xtributationTutorialSeen')) {
+                    setTimeout(startTour, 700);
+                }
+                setTimeout(initStagger, 50); 
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        // --- LÓGICA DO TOUR INTERATIVO ---
         const tourOverlay = document.getElementById('tour-overlay');
         const tourHighlight = document.querySelector('.tour-highlight');
         const tourTooltip = document.querySelector('.tour-tooltip');
@@ -436,13 +1126,11 @@
             const targetElement = document.querySelector(step.element);
             if (!targetElement) { endTour(); return; }
 
-            if (targetElement.closest('.main-content')?.id.includes('ir')) { 
-                showMainTab('ir'); 
-            } else { 
-                showMainTab('cambial'); 
-            }
+            const parentContent = targetElement.closest('.main-content');
+            if (parentContent && parentContent.id.includes('ir')) { showMainTab('ir'); } 
+            else { showMainTab('cambial'); }
             
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
             
             setTimeout(() => {
                 const rect = targetElement.getBoundingClientRect();
@@ -453,178 +1141,41 @@
 
                 tourTitle.textContent = step.title;
                 tourText.textContent = step.intro;
-                tourStepCounter.textContent = `${index + 1} de ${tourSteps.length}`;
+                tourStepCounter.textContent = `${index + 1} / ${tourSteps.length}`;
+                
+                const tooltipHeight = tourTooltip.offsetHeight;
+                const tooltipWidth = tourTooltip.offsetWidth;
+                if ((rect.bottom + tooltipHeight + 20) > window.innerHeight) {
+                    tourTooltip.style.top = `${rect.top - tooltipHeight - 15}px`;
+                } else {
+                    tourTooltip.style.top = `${rect.bottom + 15}px`;
+                }
+                
+                let tooltipLeft = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+                if (tooltipLeft < 20) { tooltipLeft = 20; }
+                if (tooltipLeft + tooltipWidth > window.innerWidth - 20) {
+                    tooltipLeft = window.innerWidth - tooltipWidth - 20;
+                }
+                tourTooltip.style.left = `${tooltipLeft}px`;
                 
                 tourPrevBtn.style.display = index === 0 ? 'none' : 'inline-flex';
                 tourNextBtn.textContent = index === tourSteps.length - 1 ? 'Finalizar' : 'Próximo';
                 tourOverlay.classList.add('active');
-            }, 500);
+            }, 400); 
         }
 
         tourNextBtn.addEventListener('click', () => { if (currentStep < tourSteps.length - 1) { currentStep++; showStep(currentStep); } else { endTour(); } });
         tourPrevBtn.addEventListener('click', () => { if (currentStep > 0) { currentStep--; showStep(currentStep); } });
         tourSkipBtn.addEventListener('click', endTour);
         openTutorialButton.addEventListener('click', startTour);
-        
+
+        // --- LÓGICA PRINCIPAL DA APLICAÇÃO ---
         window.showMainTab = (tabName) => {
             document.querySelectorAll('.main-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`main-content-${tabName}`).classList.remove('hidden');
             document.querySelectorAll('.main-tab-button').forEach(el => el.classList.remove('active'));
             document.getElementById(`main-tab-${tabName}`).classList.add('active');
+            setTimeout(initStagger, 50); 
         };
 
         // --- LÓGICA DO DASHBOARD CAMBIAL ---
-        let manualTransactions = [];
-        let currentlyEditingIndex = null;
-        let ratesMap = new Map();
-
-        function formatCurrency(value, currency = 'BRL', digits = 2) {
-            if (typeof value !== 'number' || isNaN(value)) return formatCurrency(0, currency, digits);
-            return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', { style: 'currency', currency: currency, minimumFractionDigits: digits }).format(value);
-        }
-        function formatCurrencyWithColor(value) {
-            const formattedValue = formatCurrency(value, 'BRL');
-            if (value > 0) return `<span class="text-positive font-semibold">${formattedValue}</span>`;
-            if (value < 0) return `<span class="text-negative font-semibold">${formattedValue}</span>`;
-            return `<span>${formattedValue}</span>`;
-        }
-        function getRateForDate(date) {
-            if (ratesMap.size === 0) return null;
-            let currentDate = new Date(date);
-            for (let i = 0; i < 7; i++) {
-                const lookupDateStr = currentDate.toISOString().split('T')[0];
-                if (ratesMap.has(lookupDateStr)) return ratesMap.get(lookupDateStr);
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
-            return null;
-        }
-
-        window.toggleNaoRetirada = function() {
-            const dateInput = document.getElementById('trans-date');
-            const naoRetiradaOption = document.getElementById('nao-retirada-option');
-            const typeSelect = document.getElementById('trans-type');
-            if (dateInput.value && dateInput.value.substring(5) === '12-31') {
-                naoRetiradaOption.disabled = false;
-            } else {
-                naoRetiradaOption.disabled = true;
-                if (typeSelect.value === 'NaoRetirada') typeSelect.value = 'Envio';
-            }
-        }
-        document.getElementById('trans-date').addEventListener('change', toggleNaoRetirada);
-        toggleNaoRetirada();
-
-        window.handleSaveTransaction = function() {
-            const dateInput = document.getElementById('trans-date');
-            const typeInput = document.getElementById('trans-type');
-            const valueInput = document.getElementById('trans-value');
-            
-            const sanitizedValue = valueInput.value.replace(/\./g, '').replace(',', '.');
-            const numericValue = parseFloat(sanitizedValue);
-
-            if (!dateInput.value || isNaN(numericValue) || numericValue <= 0) {
-                alert('Por favor, preencha a data e um valor positivo válido no formato 1.000,00.');
-                return;
-            }
-
-            const transactionData = { date: new Date(`${dateInput.value}T00:00:00Z`), type: typeInput.value, value: numericValue };
-            
-            if (currentlyEditingIndex !== null) {
-                if (currentlyEditingIndex === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'NaoRetirada')) {
-                    alert('O primeiro lançamento não pode ser editado para "Retirada" ou "Não Retirada".');
-                    return;
-                }
-                manualTransactions[currentlyEditingIndex] = transactionData;
-            } else {
-                if (manualTransactions.length === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'NaoRetirada')) {
-                    alert('O primeiro lançamento deve ser obrigatoriamente um ENVIO.');
-                    return;
-                }
-                manualTransactions.push(transactionData);
-            }
-            manualTransactions.sort((a, b) => a.date - b.date);
-            renderTransactionsTable();
-            cancelEdit();
-        }
-        
-        window.editTransaction = function(index) {
-            currentlyEditingIndex = index;
-            const trans = manualTransactions[index];
-            document.getElementById('trans-date').value = trans.date.toISOString().split('T')[0];
-            document.getElementById('trans-type').value = trans.type;
-            document.getElementById('trans-value').value = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(trans.value);
-            document.getElementById('add-trans-button').textContent = 'Salvar Alterações';
-            document.getElementById('cancel-edit-button').classList.remove('hidden');
-            toggleNaoRetirada();
-        }
-        
-        window.cancelEdit = function() {
-            currentlyEditingIndex = null;
-            document.getElementById('trans-date').value = '';
-            document.getElementById('trans-type').value = 'Envio';
-            document.getElementById('trans-value').value = '';
-            document.getElementById('add-trans-button').textContent = 'Adicionar +';
-            document.getElementById('cancel-edit-button').classList.add('hidden');
-            toggleNaoRetirada();
-        }
-
-        window.removeTransaction = function(index) { 
-            if (confirm('Tem certeza que deseja remover esta transação?')) {
-                manualTransactions.splice(index, 1); 
-                renderTransactionsTable(); 
-            }
-        }
-        
-        function renderTransactionsTable() {
-            const container = document.getElementById('transactions-list');
-            if (manualTransactions.length === 0) { container.innerHTML = ''; return; }
-            const headers = ['Data', 'Tipo', 'Valor (USD)', 'Cotação (R$)', 'Total (R$)', 'Ações'];
-            const data = manualTransactions.map((t, index) => {
-                const cotacaoDia = getRateForDate(t.date);
-                const cotacaoDisplay = cotacaoDia ? formatCurrency(cotacaoDia, 'BRL') : `<span class="text-xs text-text-primary">Aguardando arquivo</span>`;
-                const totalBRL = cotacaoDia ? t.value * cotacaoDia : null;
-                const totalBRLDisplay = totalBRL !== null ? formatCurrency(totalBRL) : `<span class="text-xs text-text-primary">---</span>`;
-                const actions = `<div class="flex gap-2"><button onclick="editTransaction(${index})" class="text-warning-color hover:text-white font-semibold text-xs uppercase">Editar</button><button onclick="removeTransaction(${index})" class="text-negative-color hover:text-white font-semibold text-xs uppercase">Remover</button></div>`;
-                return [t.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'}), t.type, formatCurrency(t.value, 'USD'), cotacaoDisplay, totalBRLDisplay, actions];
-            });
-            let table = `<h4 class="text-md font-semibold mb-2 mt-4 border-t border-border-color pt-4 text-content-strong">Transações a Processar:</h4><div class="overflow-x-auto bg-main-bg rounded-md border border-border-color max-h-64"><table class="min-w-full text-sm"><thead><tr class="bg-card-bg">`;
-            headers.forEach(h => table += `<th class="text-left py-2 px-3 font-medium text-text-primary uppercase tracking-wider">${h}</th>`);
-            table += `</tr></thead><tbody class="divide-y divide-border-color">`;
-            data.forEach(row => { table += `<tr class="hover:bg-card-bg">`; row.forEach(cell => table += `<td class="py-2 px-3 whitespace-nowrap">${cell}</td>`); table += `</tr>`; });
-            table += `</tbody></table></div>`;
-            container.innerHTML = table;
-        }
-        
-        document.getElementById('rates-file').addEventListener('change', async (event) => {
-            const ratesFile = event.target.files[0];
-            if (!ratesFile) return;
-            try {
-                const results = await new Promise((resolve, reject) => Papa.parse(ratesFile, { skipEmptyLines: true, complete: resolve, error: reject }));
-                ratesMap.clear();
-                results.data.slice(2).forEach(row => {
-                    if (row.length < 3) return;
-                    const [dateStr, , rateStr] = row;
-                    if (!dateStr || !rateStr) return;
-                    const dateParts = dateStr.split('/');
-                    if (dateParts.length !== 3) return;
-                    const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00Z`);
-                    const rate = parseFloat(String(rateStr).replace('R$ ', '').replace(',', '.'));
-                    if (!isNaN(date.getTime()) && !isNaN(rate)) ratesMap.set(date.toISOString().split('T')[0], rate);
-                });
-                renderTransactionsTable();
-            } catch (error) {
-                console.error("Error parsing rates file:", error);
-                showError('results-area-cambial', `Erro ao ler o arquivo de cotações: ${error.message}`);
-            }
-        });
-
-        window.handleProcessCambial = async () => { /* ... (Omitted for brevity, no changes needed) ... */ };
-        function processAndRenderCambial(transactions) { /* ... (Omitted for brevity, no changes needed) ... */ };
-        function createSimpleTable(headers, data) { /* ... (Omitted for brevity, no changes needed) ... */ };
-        function exportToCSV(headers, data, kpis) { /* ... (Omitted for brevity, no changes needed) ... */ };
-
-        // --- LÓGICA DO IMPOSTO DE RENDA (NO CHANGES) ---
-        // ... All functions related to the IR dashboard remain the same ...
-
-    </script>
-</body>
-</html>
