@@ -740,7 +740,8 @@
                 
                 let resultado_liquido_usd;
                 if (profit > 0) {
-                    resultado_liquido_usd = profit + commission + swap;
+                    // LÓGICA CORRIGIDA AQUI
+                    resultado_liquido_usd = profit - (commission + swap);
                 } else {
                     resultado_liquido_usd = profit;
                 }
