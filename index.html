@@ -85,7 +85,6 @@
         .alocar-card-title { font-size: 1rem; font-weight: 700; color: var(--text-headings); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .alocar-card-value { font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
         
-        /* Estilos da Apuração Anual de IR */
         .month-card { border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; text-align: center; cursor: pointer; transition: var(--transition-fluid); background: var(--card-bg); }
         .month-card:hover { transform: translateY(-4px); border-color: var(--accent-color); }
         .month-card.profit { border-left: 4px solid var(--positive-color); }
@@ -93,7 +92,7 @@
         .month-name { font-size: 1.125rem; font-weight: 600; color: var(--text-headings); }
         .month-result { font-size: 1.25rem; font-weight: 700; margin-top: 0.5rem; }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(13, 17, 23, 0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(13, 17, 23, 0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1500; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { background-color: var(--main-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 0.5rem; max-width: 90%; width: 800px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: all 0.3s ease-in-out; }
         .modal-overlay.active .modal-content { transform: scale(1); }
@@ -102,141 +101,213 @@
             border: 1px solid var(--accent-color);
             box-shadow: 0 0 25px -5px rgba(88, 166, 255, 0.4);
         }
+        
+        .important-note { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background-color: rgba(210, 153, 34, 0.1); border-left: 4px solid var(--warning-color); }
+        .important-note p:first-child { color: var(--warning-color); font-weight: 600;}
+        .important-note p:last-child { color: var(--text-headings); opacity: 0.9;}
+
+        #login-screen { background: var(--main-bg); display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 2000; }
+        .login-box { text-align: center; width: 100%; max-width: 380px; animation: fadeInUp 0.5s var(--transition-fluid) both; }
+        .message { margin-top: 1rem; font-weight: 500; display: none; padding: 0.8rem; border-radius: 6px; font-size: 0.9rem; }
+        .message.error { color: #fff; background-color: rgba(248, 81, 73, 0.5); border: 1px solid rgba(248,81,73,0.8); }
+        .message.success { color: #fff; background-color: rgba(63, 185, 80, 0.5); border: 1px solid rgba(63,185,80,0.8); }
+
+        #auth-container { position: fixed; top: 1rem; right: 1rem; z-index: 1001; background: var(--card-bg); backdrop-filter: blur(10px); padding: 0.5rem 0.75rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--border-color); }
+
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: var(--main-bg); z-index: 1999; display: flex; justify-content: center; align-items: center; text-align: center; transition: opacity 0.5s ease-out; }
+        #animated-logo path { opacity: 0; animation: fadeInUp 0.7s ease-out forwards; }
+        #animated-logo #logo-part-1 { animation-delay: 0.1s; } #animated-logo #logo-part-2 { animation-delay: 0.2s; } #animated-logo #logo-part-3 { animation-delay: 0.3s; } #animated-logo #logo-part-4 { animation-delay: 0.4s; } #animated-logo #logo-part-5 { animation-delay: 0.5s; } #animated-logo #logo-part-6 { animation-delay: 0.6s; } #animated-logo #logo-part-7 { animation-delay: 0.7s; } #animated-logo #logo-part-8 { animation-delay: 0.8s; }
+
+        #tour-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9998; opacity: 0; transition: opacity 0.3s ease-out;
+            pointer-events: none; background-color: transparent; backdrop-filter: none;
+        }
+        #tour-overlay.active { opacity: 1; pointer-events: all; }
+        .tour-highlight { position: absolute; transition: var(--transition-fluid); border: 2px solid var(--accent-color); box-shadow: 0 0 25px 5px rgba(88, 166, 255, 0.6); border-radius: 8px; }
+        .tour-tooltip { position: absolute; z-index: 9999; background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid var(--border-color); width: 320px; padding: 1.5rem; animation: fadeInUp 0.4s var(--transition-fluid) both; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .tour-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); margin-top: 1.5rem; padding-top: 1rem;}
 
         @media print {
-            body, .content-wrapper, #printable-report-area { background: #ffffff !important; color: #000000 !important; }
+            body, .content-wrapper, #printable-report-area, #pdf-export-cambial { background: #ffffff !important; color: #000000 !important; }
             body * { visibility: hidden; }
-            #printable-report-area, #printable-report-area * { visibility: visible; }
-            #printable-report-area { position: absolute; left: 0; top: 0; width: 100%; padding: 1rem; }
+            #printable-report-area, #printable-report-area *, #pdf-export-cambial, #pdf-export-cambial * { visibility: visible; }
+            #printable-report-area, #pdf-export-cambial { position: absolute; left: 0; top: 0; width: 100%; padding: 1rem; }
             .card { background-color: #f8f9fa !important; box-shadow: none; border: 1px solid #dee2e6; color: #000 !important; }
             h1, h2, h3, p, span, th, td { color: #000 !important; }
             .text-positive { color: #28a745 !important; }
             .text-negative { color: #dc3545 !important; }
             .text-accent-color { color: #007bff !important; }
             .month-card { page-break-inside: avoid; }
-            #download-buttons-wrapper, #export-buttons { display: none !important; }
+            #download-buttons-wrapper, #export-buttons, #open-tutorial-button, #auth-container { display: none !important; }
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased" style="overflow: hidden;">
 
-    <div class="content-wrapper">
-        <header class="mb-12 flex justify-between items-center relative stagger-in" style="--stagger-index: 0;">
-             <div class="flex items-center gap-4">
-                <svg width="40" height="40" viewBox="0 0 841 1082" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#C9D1D9">
-                    <path d="M 247.5 2 L 258.5 3 L 276.5 7 L 329.5 24 Q 389.9 45.6 446.5 71 L 524.5 110 L 556.5 130 L 581 150.5 L 589 161.5 Q 591.9 166.1 591 174.5 Q 584.3 208.8 560.5 226 Q 553.7 232.2 543.5 235 L 531.5 235 Q 518.7 232.3 512 223.5 Q 493.5 195 470.5 171 L 428.5 183 L 365.5 205 L 329.5 220 L 285.5 243 L 283 243 L 289.5 235 Q 305.3 221.3 324 210.5 Q 279.6 194.9 251 163.5 Q 241.7 152.8 236 138.5 L 232 123.5 L 231 103.5 L 235 82.5 L 238 74.5 L 240.5 72 L 244 74.5 Q 252 101.5 269.5 119 Q 293.7 143.8 328.5 158 L 357.5 168 L 392.5 176 L 404.5 177 L 428.5 170 L 463 163.5 Q 420 121.5 370.5 86 Q 316.4 46.1 254.5 14 L 245 5.5 Q 243.9 2.2 246.5 3 L 247.5 2 Z M 236.5 269 L 237 272 Q 193.7 293.9 161 327.5 L 148 345.5 Q 144.2 352.2 144 362.5 Q 145.9 373.6 153.5 379 L 170.5 390 L 200.5 403 L 246.5 416 L 301.5 427 L 309 431.5 L 307.5 434 L 300.5 436 L 299.5 435 L 287.5 435 L 286.5 434 L 276.5 434 L 275.5 433 L 266.5 433 L 265.5 432 L 243.5 430 L 200.5 421 L 154.5 407 Q 143.8 403.2 138 394.5 L 128 374.5 L 126 366.5 L 126 347.5 Q 128.9 333.4 139.5 327 Q 183.4 294.2 236 271 L 236.5 269 Z M 531.5 318 Q 572.9 344.6 605 380.5 Q 642.7 421.3 673 469.5 Q 703.5 517.5 728 571.5 Q 754 629 774 692.5 L 799 784.5 L 810 836.5 L 810 842 Q 813.7 840.6 812 846.5 L 819 880.5 L 819 886.5 L 822 899.5 L 822 905.5 L 823 906.5 L 826 933.5 L 828 941.5 L 828 948.5 L 829 949.5 L 829 956.5 L 830 957.5 L 830 965.5 L 831 966.5 L 832 983.5 L 833 984.5 L 833 992.5 L 835 1002.5 L 835 1011.5 L 837 1021.5 L 837 1030.5 L 838 1031.5 L 838 1040.5 L 839 1041.5 L 840 1062.5 L 841 1063.5 L 841 1079.5 L 839 1078.5 L 824 1007.5 L 812 957 Q 808.7 958.3 810 953.5 L 785 858.5 L 748 734.5 L 712 630.5 L 682 556.5 Q 650.8 483.7 611 419.5 L 577 370.5 Q 556.1 342.9 531 319.5 L 531.5 318 Z M 369 446 Q 371.7 444.9 371 447.5 L 378 467.5 L 382 488.5 L 383 506.5 L 384 507.5 L 384 550.5 L 383 551.5 L 383 562.5 L 382 563.5 L 381 578.5 L 376 605.5 L 370 629.5 L 361 657.5 L 344 699.5 L 300 786.5 L 297.5 789 L 297 787.5 L 315 742.5 L 337 674.5 L 354 606.5 L 357 586.5 L 359 580.5 L 359 573.5 L 346 520.5 L 326 463.5 L 333 469.5 Q 353.1 494.9 365.5 528 L 367 524.5 L 368 501.5 L 369 500.5 L 370 451.5 L 369 446 Z M 179.5 490 L 182 490.5 L 130.5 525 L 96.5 550 Q 64.7 573.7 38 602.5 L 37 621.5 Q 39.4 636.1 46 646.5 Q 56.6 663.4 71.5 676 Q 93.9 695.6 121.5 710 Q 145.4 678.4 174.5 652 Q 210.4 618.9 252.5 592 L 300.5 565 L 321.5 555 L 326.5 554 L 325.5 556 L 309.5 565 L 270.5 594 L 268.5 594 L 219 639.5 Q 149.1 711.1 103 806.5 L 77 883.5 L 58 958.5 L 58 963.5 L 53 987.5 L 53 994.5 L 51 1003.5 L 51 1013.5 L 50 1014.5 L 50 1030.5 L 49 1031.5 L 49 1078.5 L 47.5 1080 L 45 1071.5 L 45 1064.5 L 44 1063.5 L 44 1056.5 L 41 1039.5 L 41 1031.5 L 40 1030.5 L 40 1022.5 L 38 1013.5 L 38 1004.5 L 37 1003.5 L 36 975.5 L 35 974.5 L 35 942.5 L 36 941.5 L 37 914.5 L 38 913.5 L 38 906.5 L 39 905.5 L 42 881.5 L 47 859.5 L 56 829.5 L 71 791.5 Q 84.2 763.4 100 739 L 72.5 734 L 47.5 726 Q 25 717.5 10 701.5 L 1 685.5 L 0 681.5 L 0 662.5 L 9 638.5 Q 21.2 617.2 38 600.5 L 39 594.5 L 46 580.5 Q 57 563.5 72.5 551 Q 91.4 535.4 113.5 523 L 179.5 490 Z M 632.5 775 L 640.5 775 L 641 776.5 L 593.5 800 L 577 810 L 575.5 813 Q 540.8 835.3 514 865.5 Q 474 909 448 966.5 L 429 1017.5 L 418.5 1057 L 418 1053.5 L 419 1052.5 L 419 1045.5 L 425 1012.5 L 433 979.5 L 442 949.5 L 458 908.5 Q 471.2 878.7 489 853.5 Q 502 835 518.5 820 L 529 811.5 L 530.5 809 Q 546.3 796.8 566.5 789 L 586.5 783 L 591.5 783 L 632.5 775 Z M 338.5 820 Q 341.1 819.2 340 822.5 L 329.5 831 L 259.5 877 Q 231.5 896 209 920.5 Q 173.9 958.9 144 1002.5 Q 127 1026.5 116.5 1057 L 116 1052.5 L 126 1012.5 Q 135.2 986.2 148 963.5 Q 171.4 922.4 205.5 892 Q 232.8 867.8 266.5 850 L 316.5 828 L 338.5 820 Z M 361.5 824 L 363 826.5 L 348 902.5 L 347 918.5 L 346 919.5 L 346 948.5 L 347 949.5 L 347 962.5 L 348 963.5 L 349 982.5 L 350 983.5 L 350 990.5 L 351 991.5 L 354 1015.5 L 363 1047.5 L 368 1056.5 L 366 1057 Q 347.3 1031.3 337 996.5 L 333 980.5 L 331 961.5 L 330 960.5 L 330 920.5 L 331 919.5 L 331 912.5 L 334 895.5 L 339 876.5 L 354 837.5 L 359 826.5 L 361.5 824 Z " />
-                </svg>
-                <div>
-                    <h1 class="text-3xl font-bold text-white tracking-tighter">XTributation</h1>
-                    <p class="text-base text-text-primary">Plataforma de Imposto de Renda XTraders</p>
-                </div>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 class="text-3xl font-semibold mb-3 text-white">Plataforma XTributation</h2>
+            <p class="text-base text-text-primary mb-8">Análise de performance e tributação.</p>
+            <div class="space-y-4">
+                <input type="email" id="email-input" placeholder="Seu e-mail" class="input-field">
+                <input type="password" id="password-input" placeholder="Sua senha" class="input-field">
             </div>
-        </header>
-        
-        <div class="flex justify-center mb-12 stagger-in" style="--stagger-index: 1;">
-            <div class="tab-container">
-                <button id="main-tab-cambial" onclick="showMainTab('cambial')" class="main-tab-button active">Dashboard Cambial</button>
-                <button id="main-tab-ir" onclick="showMainTab('ir')" class="main-tab-button">Apuração Anual de IR</button>
-            </div>
+            <button id="sign-in-button" class="mt-6 btn btn-primary w-full text-base py-3">
+                <span>Acessar Plataforma</span>
+            </button>
+            <a href="#" id="forgot-password-link" class="text-sm text-text-primary hover:text-accent-color transition-colors duration-200 mt-6 inline-block">Problemas para acessar?</a>
+            <p id="message" class="message"></p>
         </div>
-
-        <div id="main-content-cambial" class="main-content">
-            <div id="cambial-input-area" class="space-y-6">
-                <div class="card">
-                    <div class="card-border"></div>
-                    <h3 class="text-lg font-semibold mb-4 text-white">Adicionar Transação de Capital</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                        <div><label class="block text-xs font-medium mb-1">Data</label><input type="date" id="trans-date" class="input-field"></div>
-                        <div><label class="block text-xs font-medium mb-1">Tipo</label><select id="trans-type" class="input-field"><option value="Envio">Envio</option><option value="Retirada">Retirada</option><option value="NaoRetirada" id="nao-retirada-option" disabled>Não Retirada</option></select></div>
-                        <div><label class="block text-xs font-medium mb-1">Valor (USD)</label><input type="text" id="trans-value" placeholder="1.000,00" class="input-field"></div>
-                        <div class="flex gap-2">
-                            <button id="add-trans-button" onclick="handleSaveTransaction()" class="btn btn-secondary w-full">Adicionar +</button>
-                            <button id="cancel-edit-button" onclick="cancelEdit()" class="btn btn-secondary w-full hidden" style="border-color: var(--warning-color); color: var(--warning-color);">Cancelar</button>
-                        </div>
-                    </div>
-                    <div id="transactions-list" class="mt-6"></div>
-                </div>
-                <div class="card">
-                    <div class="card-border"></div>
-                    <h3 class="text-lg font-semibold mb-3 text-white">Fontes de Dados das Cotações (Obrigatório)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium mb-1" for="rates-file-venda">Cotação de Venda (para Envios)</label>
-                            <input type="file" id="rates-file-venda" accept=".csv" class="input-field">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium mb-1" for="rates-file-compra">Cotação de Compra (para Retiradas)</label>
-                            <input type="file" id="rates-file-compra" accept=".csv" class="input-field">
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center pt-4">
-                    <button onclick="handleProcessCambial()" class="btn btn-primary text-lg px-12 py-3">
-                        <span>Analisar Variação Cambial</span>
-                    </button>
-                </div>
-                 <div id="alocar-proximo-ano-card" class="alocar-card hidden">
-                    <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
-                    <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
-                </div>
-            </div>
-            <div id="results-area-cambial" class="transition-opacity duration-500 mt-12"></div>
+    </div>
+    
+    <div id="loading-overlay" style="display: none; opacity: 1;">
+        <div class="text-center">
+            <svg id="animated-logo" width="200" height="216" viewBox="0 0 841 1082" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF">
+              <path id="logo-part-1" d="M 247.5 2 L 258.5 3 L 276.5 7 L 329.5 24 Q 389.9 45.6 446.5 71 L 524.5 110 L 556.5 130 L 581 150.5 L 589 161.5 Q 591.9 166.1 591 174.5 Q 584.3 208.8 560.5 226 Q 553.7 232.2 543.5 235 L 531.5 235 Q 518.7 232.3 512 223.5 Q 493.5 195 470.5 171 L 428.5 183 L 365.5 205 L 329.5 220 L 285.5 243 L 283 243 L 289.5 235 Q 305.3 221.3 324 210.5 Q 279.6 194.9 251 163.5 Q 241.7 152.8 236 138.5 L 232 123.5 L 231 103.5 L 235 82.5 L 238 74.5 L 240.5 72 L 244 74.5 Q 252 101.5 269.5 119 Q 293.7 143.8 328.5 158 L 357.5 168 L 392.5 176 L 404.5 177 L 428.5 170 L 463 163.5 Q 420 121.5 370.5 86 Q 316.4 46.1 254.5 14 L 245 5.5 Q 243.9 2.2 246.5 3 L 247.5 2 Z " />
+              <path id="logo-part-2" d="M 236.5 269 L 237 272 Q 193.7 293.9 161 327.5 L 148 345.5 Q 144.2 352.2 144 362.5 Q 145.9 373.6 153.5 379 L 170.5 390 L 200.5 403 L 246.5 416 L 301.5 427 L 309 431.5 L 307.5 434 L 300.5 436 L 299.5 435 L 287.5 435 L 286.5 434 L 276.5 434 L 275.5 433 L 266.5 433 L 265.5 432 L 243.5 430 L 200.5 421 L 154.5 407 Q 143.8 403.2 138 394.5 L 128 374.5 L 126 366.5 L 126 347.5 Q 128.9 333.4 139.5 327 Q 183.4 294.2 236 271 L 236.5 269 Z " />
+              <path id="logo-part-3" d="M 531.5 318 Q 572.9 344.6 605 380.5 Q 642.7 421.3 673 469.5 Q 703.5 517.5 728 571.5 Q 754 629 774 692.5 L 799 784.5 L 810 836.5 L 810 842 Q 813.7 840.6 812 846.5 L 819 880.5 L 819 886.5 L 822 899.5 L 822 905.5 L 823 906.5 L 826 933.5 L 828 941.5 L 828 948.5 L 829 949.5 L 829 956.5 L 830 957.5 L 830 965.5 L 831 966.5 L 832 983.5 L 833 984.5 L 833 992.5 L 835 1002.5 L 835 1011.5 L 837 1021.5 L 837 1030.5 L 838 1031.5 L 838 1040.5 L 839 1041.5 L 840 1062.5 L 841 1063.5 L 841 1079.5 L 839 1078.5 L 824 1007.5 L 812 957 Q 808.7 958.3 810 953.5 L 785 858.5 L 748 734.5 L 712 630.5 L 682 556.5 Q 650.8 483.7 611 419.5 L 577 370.5 Q 556.1 342.9 531 319.5 L 531.5 318 Z " />
+              <path id="logo-part-4" d="M 369 446 Q 371.7 444.9 371 447.5 L 378 467.5 L 382 488.5 L 383 506.5 L 384 507.5 L 384 550.5 L 383 551.5 L 383 562.5 L 382 563.5 L 381 578.5 L 376 605.5 L 370 629.5 L 361 657.5 L 344 699.5 L 300 786.5 L 297.5 789 L 297 787.5 L 315 742.5 L 337 674.5 L 354 606.5 L 357 586.5 L 359 580.5 L 359 573.5 L 346 520.5 L 326 463.5 L 333 469.5 Q 353.1 494.9 365.5 528 L 367 524.5 L 368 501.5 L 369 500.5 L 370 451.5 L 369 446 Z " />
+              <path id="logo-part-5" d="M 179.5 490 L 182 490.5 L 130.5 525 L 96.5 550 Q 64.7 573.7 38 602.5 L 37 621.5 Q 39.4 636.1 46 646.5 Q 56.6 663.4 71.5 676 Q 93.9 695.6 121.5 710 Q 145.4 678.4 174.5 652 Q 210.4 618.9 252.5 592 L 300.5 565 L 321.5 555 L 326.5 554 L 325.5 556 L 309.5 565 L 270.5 594 L 268.5 594 L 219 639.5 Q 149.1 711.1 103 806.5 L 77 883.5 L 58 958.5 L 58 963.5 L 53 987.5 L 53 994.5 L 51 1003.5 L 51 1013.5 L 50 1014.5 L 50 1030.5 L 49 1031.5 L 49 1078.5 L 47.5 1080 L 45 1071.5 L 45 1064.5 L 44 1063.5 L 44 1056.5 L 41 1039.5 L 41 1031.5 L 40 1030.5 L 40 1022.5 L 38 1013.5 L 38 1004.5 L 37 1003.5 L 36 975.5 L 35 974.5 L 35 942.5 L 36 941.5 L 37 914.5 L 38 913.5 L 38 906.5 L 39 905.5 L 42 881.5 L 47 859.5 L 56 829.5 L 71 791.5 Q 84.2 763.4 100 739 L 72.5 734 L 47.5 726 Q 25 717.5 10 701.5 L 1 685.5 L 0 681.5 L 0 662.5 L 9 638.5 Q 21.2 617.2 38 600.5 L 39 594.5 L 46 580.5 Q 57 563.5 72.5 551 Q 91.4 535.4 113.5 523 L 179.5 490 Z " />
+              <path id="logo-part-6" d="M 632.5 775 L 640.5 775 L 641 776.5 L 593.5 800 L 577 810 L 575.5 813 Q 540.8 835.3 514 865.5 Q 474 909 448 966.5 L 429 1017.5 L 418.5 1057 L 418 1053.5 L 419 1052.5 L 419 1045.5 L 425 1012.5 L 433 979.5 L 442 949.5 L 458 908.5 Q 471.2 878.7 489 853.5 Q 502 835 518.5 820 L 529 811.5 L 530.5 809 Q 546.3 796.8 566.5 789 L 586.5 783 L 591.5 783 L 632.5 775 Z " />
+              <path id="logo-part-7" d="M 338.5 820 Q 341.1 819.2 340 822.5 L 329.5 831 L 259.5 877 Q 231.5 896 209 920.5 Q 173.9 958.9 144 1002.5 Q 127 1026.5 116.5 1057 L 116 1052.5 L 126 1012.5 Q 135.2 986.2 148 963.5 Q 171.4 922.4 205.5 892 Q 232.8 867.8 266.5 850 L 316.5 828 L 338.5 820 Z " />
+              <path id="logo-part-8" d="M 361.5 824 L 363 826.5 L 348 902.5 L 347 918.5 L 346 919.5 L 346 948.5 L 347 949.5 L 347 962.5 L 348 963.5 L 349 982.5 L 350 983.5 L 350 990.5 L 351 991.5 L 354 1015.5 L 363 1047.5 L 368 1056.5 L 366 1057 Q 347.3 1031.3 337 996.5 L 333 980.5 L 331 961.5 L 330 960.5 L 330 920.5 L 331 919.5 L 331 912.5 L 334 895.5 L 339 876.5 L 354 837.5 L 359 826.5 L 361.5 824 Z " />
+            </svg>
+            <p class="text-text-primary mt-4">Carregando plataforma...</p>
         </div>
-        
-        <div id="main-content-ir" class="main-content hidden">
-            <div class="card stagger-in">
-                <div class="card-border"></div>
-                <h2 class="text-xl font-semibold mb-6 text-white text-center">Apuração de Imposto de Renda Anual</h2>
-                <p class="text-center text-sm mb-6 -mt-4">O cálculo do imposto é consolidado e apurado anualmente.</p>
-                <div id="alert-box" class="hidden p-4 mb-6 text-sm rounded-lg bg-yellow-900 text-yellow-300 border border-yellow-700" role="alert"></div>
-                <div class="grid md:grid-cols-2 gap-8 mb-8">
-                    <label for="trades-file" class="w-full flex flex-col justify-center items-center p-6 border-2 border-dashed border-border-color rounded-lg cursor-pointer hover:border-accent-color transition-colors">
-                        <svg class="mx-auto h-12 w-12 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                        <span id="trades-file-name" class="mt-2 text-sm font-semibold text-text-headings">Relatório de Operações (.csv)</span>
-                    </label>
-                    <input type="file" id="trades-file" accept=".csv" class="hidden"/>
+    </div>
+    
+    <div id="auth-container" style="display: none;">
+        <span id="user-email" class="text-white text-sm font-medium"></span>
+        <button id="sign-out-button" class="text-xs text-negative-color hover:text-white transition-colors">Sair</button>
+    </div>
 
-                    <label for="quotes-file" class="w-full flex flex-col justify-center items-center p-6 border-2 border-dashed border-border-color rounded-lg cursor-pointer hover:border-accent-color transition-colors">
-                        <svg class="mx-auto h-12 w-12 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                        <span id="quotes-file-name" class="mt-2 text-sm font-semibold text-text-headings">Planilha de Cotações (.csv)</span>
-                    </label>
-                    <input type="file" id="quotes-file" accept=".csv" class="hidden"/>
+    <div id="calculator-content" style="display: none;">
+        <div class="content-wrapper">
+            <header class="mb-12 flex justify-between items-center relative stagger-in" style="--stagger-index: 0;">
+                 <div class="flex items-center gap-4">
+                    <svg width="40" height="40" viewBox="0 0 841 1082" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#C9D1D9">
+                       <path d="M 247.5 2 L 258.5 3 L 276.5 7 L 329.5 24 Q 389.9 45.6 446.5 71 L 524.5 110 L 556.5 130 L 581 150.5 L 589 161.5 Q 591.9 166.1 591 174.5 Q 584.3 208.8 560.5 226 Q 553.7 232.2 543.5 235 L 531.5 235 Q 518.7 232.3 512 223.5 Q 493.5 195 470.5 171 L 428.5 183 L 365.5 205 L 329.5 220 L 285.5 243 L 283 243 L 289.5 235 Q 305.3 221.3 324 210.5 Q 279.6 194.9 251 163.5 Q 241.7 152.8 236 138.5 L 232 123.5 L 231 103.5 L 235 82.5 L 238 74.5 L 240.5 72 L 244 74.5 Q 252 101.5 269.5 119 Q 293.7 143.8 328.5 158 L 357.5 168 L 392.5 176 L 404.5 177 L 428.5 170 L 463 163.5 Q 420 121.5 370.5 86 Q 316.4 46.1 254.5 14 L 245 5.5 Q 243.9 2.2 246.5 3 L 247.5 2 Z M 236.5 269 L 237 272 Q 193.7 293.9 161 327.5 L 148 345.5 Q 144.2 352.2 144 362.5 Q 145.9 373.6 153.5 379 L 170.5 390 L 200.5 403 L 246.5 416 L 301.5 427 L 309 431.5 L 307.5 434 L 300.5 436 L 299.5 435 L 287.5 435 L 286.5 434 L 276.5 434 L 275.5 433 L 266.5 433 L 265.5 432 L 243.5 430 L 200.5 421 L 154.5 407 Q 143.8 403.2 138 394.5 L 128 374.5 L 126 366.5 L 126 347.5 Q 128.9 333.4 139.5 327 Q 183.4 294.2 236 271 L 236.5 269 Z M 531.5 318 Q 572.9 344.6 605 380.5 Q 642.7 421.3 673 469.5 Q 703.5 517.5 728 571.5 Q 754 629 774 692.5 L 799 784.5 L 810 836.5 L 810 842 Q 813.7 840.6 812 846.5 L 819 880.5 L 819 886.5 L 822 899.5 L 822 905.5 L 823 906.5 L 826 933.5 L 828 941.5 L 828 948.5 L 829 949.5 L 829 956.5 L 830 957.5 L 830 965.5 L 831 966.5 L 832 983.5 L 833 984.5 L 833 992.5 L 835 1002.5 L 835 1011.5 L 837 1021.5 L 837 1030.5 L 838 1031.5 L 838 1040.5 L 839 1041.5 L 840 1062.5 L 841 1063.5 L 841 1079.5 L 839 1078.5 L 824 1007.5 L 812 957 Q 808.7 958.3 810 953.5 L 785 858.5 L 748 734.5 L 712 630.5 L 682 556.5 Q 650.8 483.7 611 419.5 L 577 370.5 Q 556.1 342.9 531 319.5 L 531.5 318 Z M 369 446 Q 371.7 444.9 371 447.5 L 378 467.5 L 382 488.5 L 383 506.5 L 384 507.5 L 384 550.5 L 383 551.5 L 383 562.5 L 382 563.5 L 381 578.5 L 376 605.5 L 370 629.5 L 361 657.5 L 344 699.5 L 300 786.5 L 297.5 789 L 297 787.5 L 315 742.5 L 337 674.5 L 354 606.5 L 357 586.5 L 359 580.5 L 359 573.5 L 346 520.5 L 326 463.5 L 333 469.5 Q 353.1 494.9 365.5 528 L 367 524.5 L 368 501.5 L 369 500.5 L 370 451.5 L 369 446 Z M 179.5 490 L 182 490.5 L 130.5 525 L 96.5 550 Q 64.7 573.7 38 602.5 L 37 621.5 Q 39.4 636.1 46 646.5 Q 56.6 663.4 71.5 676 Q 93.9 695.6 121.5 710 Q 145.4 678.4 174.5 652 Q 210.4 618.9 252.5 592 L 300.5 565 L 321.5 555 L 326.5 554 L 325.5 556 L 309.5 565 L 270.5 594 L 268.5 594 L 219 639.5 Q 149.1 711.1 103 806.5 L 77 883.5 L 58 958.5 L 58 963.5 L 53 987.5 L 53 994.5 L 51 1003.5 L 51 1013.5 L 50 1014.5 L 50 1030.5 L 49 1031.5 L 49 1078.5 L 47.5 1080 L 45 1071.5 L 45 1064.5 L 44 1063.5 L 44 1056.5 L 41 1039.5 L 41 1031.5 L 40 1030.5 L 40 1022.5 L 38 1013.5 L 38 1004.5 L 37 1003.5 L 36 975.5 L 35 974.5 L 35 942.5 L 36 941.5 L 37 914.5 L 38 913.5 L 38 906.5 L 39 905.5 L 42 881.5 L 47 859.5 L 56 829.5 L 71 791.5 Q 84.2 763.4 100 739 L 72.5 734 L 47.5 726 Q 25 717.5 10 701.5 L 1 685.5 L 0 681.5 L 0 662.5 L 9 638.5 Q 21.2 617.2 38 600.5 L 39 594.5 L 46 580.5 Q 57 563.5 72.5 551 Q 91.4 535.4 113.5 523 L 179.5 490 Z M 632.5 775 L 640.5 775 L 641 776.5 L 593.5 800 L 577 810 L 575.5 813 Q 540.8 835.3 514 865.5 Q 474 909 448 966.5 L 429 1017.5 L 418.5 1057 L 418 1053.5 L 419 1052.5 L 419 1045.5 L 425 1012.5 L 433 979.5 L 442 949.5 L 458 908.5 Q 471.2 878.7 489 853.5 Q 502 835 518.5 820 L 529 811.5 L 530.5 809 Q 546.3 796.8 566.5 789 L 586.5 783 L 591.5 783 L 632.5 775 Z M 338.5 820 Q 341.1 819.2 340 822.5 L 329.5 831 L 259.5 877 Q 231.5 896 209 920.5 Q 173.9 958.9 144 1002.5 Q 127 1026.5 116.5 1057 L 116 1052.5 L 126 1012.5 Q 135.2 986.2 148 963.5 Q 171.4 922.4 205.5 892 Q 232.8 867.8 266.5 850 L 316.5 828 L 338.5 820 Z M 361.5 824 L 363 826.5 L 348 902.5 L 347 918.5 L 346 919.5 L 346 948.5 L 347 949.5 L 347 962.5 L 348 963.5 L 349 982.5 L 350 983.5 L 350 990.5 L 351 991.5 L 354 1015.5 L 363 1047.5 L 368 1056.5 L 366 1057 Q 347.3 1031.3 337 996.5 L 333 980.5 L 331 961.5 L 330 960.5 L 330 920.5 L 331 919.5 L 331 912.5 L 334 895.5 L 339 876.5 L 354 837.5 L 359 826.5 L 361.5 824 Z " />
+                    </svg>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white tracking-tighter">XTributation</h1>
+                        <p class="text-base text-text-primary">Plataforma de Imposto de Renda XTraders</p>
+                    </div>
                 </div>
-                <button id="process-button" class="btn btn-primary w-full text-base py-3">
-                    <span id="button-text">Apurar Impostos</span>
-                    <div id="loader" class="loader !w-6 !h-6 hidden ml-3"></div>
+                <button id="open-tutorial-button" class="btn btn-secondary !p-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </button>
+            </header>
+            
+            <div class="flex justify-center mb-12 stagger-in" style="--stagger-index: 1;">
+                <div id="tour-step-1" class="tab-container">
+                    <button id="main-tab-cambial" onclick="showMainTab('cambial')" class="main-tab-button active">Dashboard Cambial</button>
+                    <button id="main-tab-ir" onclick="showMainTab('ir')" class="main-tab-button">Apuração Anual de IR</button>
+                </div>
             </div>
 
-            <div id="results" class="hidden mt-12 stagger-in">
-                <div id="printable-report-area">
-                    <div id="success-box" class="p-4 mb-4 text-sm rounded-lg bg-green-900 text-green-300 border border-green-700"></div>
-                    <h2 class="text-2xl font-bold mb-6">📊 Resultados da Apuração</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (USD)</p><p id="total-usd" class="text-2xl font-bold text-white mt-1"></p></div>
-                        <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (BRL)</p><p id="total-brl" class="text-2xl font-bold text-white mt-1"></p></div>
-                        <div class="card highlight-card"><p class="text-sm font-medium text-text-primary">Imposto Anual Devido (DARF)</p><p id="total-tax" class="text-2xl font-bold text-accent-color mt-1"></p></div>
-                    </div>
-                    <div class="card">
+            <div id="main-content-cambial" class="main-content">
+                <div id="cambial-input-area" class="space-y-6">
+                    <div id="tour-step-2" class="card">
                         <div class="card-border"></div>
-                        <h3 class="text-lg font-semibold mb-4 text-white">Calendário Anual de Resultados</h3>
-                        <p class="text-sm mb-6">Clique num mês para ver o detalhe das operações.</p>
-                        <div id="calendar-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                        <h3 class="text-lg font-semibold mb-4 text-white">Adicionar Transação de Capital</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div><label class="block text-xs font-medium mb-1">Data</label><input type="date" id="trans-date" class="input-field"></div>
+                            <div><label class="block text-xs font-medium mb-1">Tipo</label><select id="trans-type" class="input-field"><option value="Envio">Envio</option><option value="Retirada">Retirada</option><option value="NaoRetirada" id="nao-retirada-option" disabled>Não Retirada</option></select></div>
+                            <div><label class="block text-xs font-medium mb-1">Valor (USD)</label><input type="text" id="trans-value" placeholder="1.000,00" class="input-field"></div>
+                            <div class="flex gap-2">
+                                <button id="add-trans-button" onclick="handleSaveTransaction()" class="btn btn-secondary w-full">Adicionar +</button>
+                                <button id="cancel-edit-button" onclick="cancelEdit()" class="btn btn-secondary w-full hidden" style="border-color: var(--warning-color); color: var(--warning-color);">Cancelar</button>
+                            </div>
+                        </div>
+                        <div class="important-note">
+                            <p>MUITO IMPORTANTE:</p>
+                            <p class="mt-1 text-sm">Não considerar ou informar retiradas de lucro com os seus trades neste campo. Aqui deve-se informar somente o capital originalmente enviado ou retirado do exterior (margem pra operar).</p>
+                        </div>
+                        <div id="transactions-list" class="mt-6"></div>
+                    </div>
+                    <div id="tour-step-3" class="card">
+                        <div class="card-border"></div>
+                        <h3 class="text-lg font-semibold mb-3 text-white">Fontes de Dados das Cotações (Obrigatório)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium mb-1" for="rates-file-venda">Cotação de Venda (para Envios)</label>
+                                <input type="file" id="rates-file-venda" accept=".csv" class="input-field">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1" for="rates-file-compra">Cotação de Compra (para Retiradas)</label>
+                                <input type="file" id="rates-file-compra" accept=".csv" class="input-field">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tour-step-4" class="text-center pt-4">
+                        <button onclick="handleProcessCambial()" class="btn btn-primary text-lg px-12 py-3">
+                            <span>Analisar Variação Cambial</span>
+                        </button>
+                    </div>
+                     <div id="alocar-proximo-ano-card" class="alocar-card hidden">
+                        <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
+                        <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
                     </div>
                 </div>
-                <div id="download-buttons-wrapper" class="flex flex-col sm:flex-row gap-4 mt-8">
-                    <button id="export-pdf-button" class="btn btn-secondary w-full">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span>Exportar Relatório (PDF)</span>
-                    </button>
-                    <button id="export-xls-button" class="btn btn-secondary w-full">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <span>Exportar para Excel (.csv)</span>
+                <div id="results-area-cambial" class="transition-opacity duration-500 mt-12"></div>
+            </div>
+            
+            <div id="main-content-ir" class="main-content hidden">
+                <div id="tour-step-5" class="card stagger-in">
+                    <div class="card-border"></div>
+                    <h2 class="text-xl font-semibold mb-6 text-white text-center">Apuração de Imposto de Renda Anual</h2>
+                    <p class="text-center text-sm mb-6 -mt-4">O cálculo do imposto é consolidado e apurado anualmente.</p>
+                    <div id="alert-box" class="hidden p-4 mb-6 text-sm rounded-lg bg-yellow-900 text-yellow-300 border border-yellow-700" role="alert"></div>
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <label for="trades-file" class="w-full flex flex-col justify-center items-center p-6 border-2 border-dashed border-border-color rounded-lg cursor-pointer hover:border-accent-color transition-colors">
+                            <svg class="mx-auto h-12 w-12 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                            <span id="trades-file-name" class="mt-2 text-sm font-semibold text-text-headings">Relatório de Operações (.csv)</span>
+                        </label>
+                        <input type="file" id="trades-file" accept=".csv" class="hidden"/>
+    
+                        <label for="quotes-file" class="w-full flex flex-col justify-center items-center p-6 border-2 border-dashed border-border-color rounded-lg cursor-pointer hover:border-accent-color transition-colors">
+                            <svg class="mx-auto h-12 w-12 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                            <span id="quotes-file-name" class="mt-2 text-sm font-semibold text-text-headings">Planilha de Cotações (.csv)</span>
+                        </label>
+                        <input type="file" id="quotes-file" accept=".csv" class="hidden"/>
+                    </div>
+                    <button id="process-button" class="btn btn-primary w-full text-base py-3">
+                        <span id="button-text">Apurar Impostos</span>
+                        <div id="loader" class="loader !w-6 !h-6 hidden ml-3"></div>
                     </button>
                 </div>
+    
+                <div id="results" class="hidden mt-12 stagger-in">
+                    <div id="printable-report-area">
+                        <div id="success-box" class="p-4 mb-4 text-sm rounded-lg bg-green-900 text-green-300 border border-green-700"></div>
+                        <h2 class="text-2xl font-bold mb-6">📊 Resultados da Apuração</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                            <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (USD)</p><p id="total-usd" class="text-2xl font-bold text-white mt-1"></p></div>
+                            <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (BRL)</p><p id="total-brl" class="text-2xl font-bold text-white mt-1"></p></div>
+                            <div class="card highlight-card"><p class="text-sm font-medium text-text-primary">Imposto Anual Devido (DARF)</p><p id="total-tax" class="text-2xl font-bold text-accent-color mt-1"></p></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-border"></div>
+                            <h3 class="text-lg font-semibold mb-4 text-white">Calendário Anual de Resultados</h3>
+                            <p class="text-sm mb-6">Clique num mês para ver o detalhe das operações.</p>
+                            <div id="calendar-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                        </div>
+                    </div>
+                    <div id="download-buttons-wrapper" class="flex flex-col sm:flex-row gap-4 mt-8">
+                        <button id="export-pdf-button" class="btn btn-secondary w-full">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span>Exportar Relatório (PDF)</span>
+                        </button>
+                        <button id="export-xls-button" class="btn btn-secondary w-full">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span>Exportar para Excel (.csv)</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+    
         </div>
-
     </div>
 
     <div id="trades-modal" class="modal-overlay">
@@ -260,8 +331,204 @@
             </div>
         </div>
     </div>
+    
+    <div id="tour-overlay" style="display: none;">
+        <div class="tour-highlight"></div>
+        <div class="tour-tooltip">
+             <h3 id="tour-title" class="text-xl font-bold mb-2 text-white"></h3>
+             <p id="tour-text" class="text-base mb-4 text-text-primary"></p>
+             <div class="tour-nav">
+                 <button id="tour-skip-btn" class="text-sm text-text-primary hover:text-white">Pular</button>
+                 <div class="flex items-center gap-3">
+                     <span id="tour-step-counter" class="text-sm text-text-primary"></span>
+                     <button id="tour-prev-btn" class="btn btn-secondary !py-1.5 !px-3 !text-xs">Anterior</button>
+                     <button id="tour-next-btn" class="btn btn-primary !py-1.5 !px-3 !text-xs">Próximo</button>
+                 </div>
+             </div>
+        </div>
+    </div>
 
     <script type="module">
+        // --- INICIALIZAÇÃO DO FIREBASE ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        const firebaseConfig = {
+          apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
+          authDomain: "calculadora-ir-56a2c.firebaseapp.com",
+          projectId: "calculadora-ir-56a2c",
+          storageBucket: "calculadora-ir-56a2c.appspot.com",
+          messagingSenderId: "613402077853",
+          appId: "1:613402077853:web:244d838cc2a99452288274"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // --- ELEMENTOS DO DOM (AUTENTICAÇÃO E GERAL) ---
+        const loginScreen = document.getElementById('login-screen');
+        const calculatorContent = document.getElementById('calculator-content');
+        const authContainer = document.getElementById('auth-container');
+        const userEmailDisplay = document.getElementById('user-email');
+        const signOutButton = document.getElementById('sign-out-button');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const signInButton = document.getElementById('sign-in-button');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const messageElement = document.getElementById('message');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        // --- LÓGICA DE AUTENTICAÇÃO ---
+        signInButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            messageElement.style.display = 'none';
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    messageElement.textContent = `Erro: E-mail ou senha inválidos.`;
+                    messageElement.className = 'message error';
+                    messageElement.style.display = 'block';
+                });
+        });
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            if (!email) {
+                messageElement.textContent = 'Por favor, insira o seu e-mail para redefinir a senha.';
+                messageElement.className = 'message error';
+                messageElement.style.display = 'block';
+                return;
+            }
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    messageElement.textContent = 'E-mail de redefinição enviado!';
+                    messageElement.className = 'message success';
+                })
+                .catch(error => {
+                    messageElement.textContent = `Erro ao enviar e-mail.`;
+                    messageElement.className = 'message error';
+                });
+            messageElement.style.display = 'block';
+        });
+
+        signOutButton.addEventListener('click', () => { signOut(auth); });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginScreen.style.display = 'none';
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.opacity = '1';
+
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.addEventListener('transitionend', () => {
+                        loadingOverlay.style.display = 'none';
+                    }, { once: true });
+
+                    calculatorContent.style.display = 'block';
+                    authContainer.style.display = 'flex';
+                    userEmailDisplay.textContent = user.email;
+                    document.body.style.overflow = 'auto';
+
+                    if (!localStorage.getItem('xtributationTutorialSeen')) {
+                        setTimeout(startTour, 700);
+                    }
+                }, 2500);
+
+            } else {
+                loginScreen.style.display = 'flex';
+                calculatorContent.style.display = 'none';
+                authContainer.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+        });
+        
+        // --- LÓGICA DO TOUR INTERATIVO ---
+        const tourOverlay = document.getElementById('tour-overlay');
+        const tourHighlight = document.querySelector('.tour-highlight');
+        const tourTooltip = document.querySelector('.tour-tooltip');
+        const tourTitle = document.getElementById('tour-title');
+        const tourText = document.getElementById('tour-text');
+        const tourStepCounter = document.getElementById('tour-step-counter');
+        const tourPrevBtn = document.getElementById('tour-prev-btn');
+        const tourNextBtn = document.getElementById('tour-next-btn');
+        const tourSkipBtn = document.getElementById('tour-skip-btn');
+        const openTutorialButton = document.getElementById('open-tutorial-button');
+
+        const tourSteps = [
+            { element: '#tour-step-1', title: 'Navegação Principal', intro: 'Alterne entre os dashboards para suas análises.' },
+            { element: '#tour-step-2', title: 'Adicionar Transações', intro: 'Preencha os dados de suas movimentações de capital (envios e retiradas).' },
+            { element: '#tour-step-3', title: 'Carregar Cotações', intro: 'Importe os arquivos CSV com as cotações de compra e venda do dólar para os cálculos de conversão.' },
+            { element: '#tour-step-4', title: 'Processar Análise', intro: 'Clique aqui para executar os cálculos após preencher os dados acima.' },
+            { element: '#main-tab-ir', title: 'Análise de IR', intro: 'Mude para este dashboard para analisar o imposto sobre suas operações de trade.' },
+            { element: '#tour-step-5', title: 'Relatório de Operações', intro: 'Importe seu relatório da corretora e a planilha de cotações para o cálculo do IR.' }
+        ];
+
+        let currentStep = 0;
+        function startTour() { 
+            currentStep = 0; 
+            tourOverlay.style.display = 'block'; 
+            setTimeout(() => showStep(currentStep), 50); 
+            localStorage.setItem('xtributationTutorialSeen', 'true'); 
+        }
+        function endTour() { 
+            tourOverlay.classList.remove('active'); 
+            setTimeout(() => tourOverlay.style.display = 'none', 300); 
+        }
+        function showStep(index) {
+            const step = tourSteps[index];
+            const targetElement = document.querySelector(step.element);
+            if (!targetElement) { endTour(); return; }
+
+            const parentContent = targetElement.closest('.main-content');
+            if (step.element.includes('ir') || step.element.includes('tour-step-5')) {
+                 showMainTab('ir');
+            } else { 
+                 showMainTab('cambial');
+            }
+            
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            
+            setTimeout(() => {
+                const rect = targetElement.getBoundingClientRect();
+                tourHighlight.style.width = `${rect.width + 12}px`;
+                tourHighlight.style.height = `${rect.height + 12}px`;
+                tourHighlight.style.top = `${rect.top - 6}px`;
+                tourHighlight.style.left = `${rect.left - 6}px`;
+
+                tourTitle.textContent = step.title;
+                tourText.textContent = step.intro;
+                tourStepCounter.textContent = `${index + 1} / ${tourSteps.length}`;
+                
+                const tooltipHeight = tourTooltip.offsetHeight;
+                const tooltipWidth = tourTooltip.offsetWidth;
+                if ((rect.bottom + tooltipHeight + 20) > window.innerHeight) {
+                    tourTooltip.style.top = `${rect.top - tooltipHeight - 15}px`;
+                } else {
+                    tourTooltip.style.top = `${rect.bottom + 15}px`;
+                }
+                
+                let tooltipLeft = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+                if (tooltipLeft < 20) { tooltipLeft = 20; }
+                if (tooltipLeft + tooltipWidth > window.innerWidth - 20) {
+                    tooltipLeft = window.innerWidth - tooltipWidth - 20;
+                }
+                tourTooltip.style.left = `${tooltipLeft}px`;
+                
+                tourPrevBtn.style.display = index === 0 ? 'none' : 'inline-flex';
+                tourNextBtn.textContent = index === tourSteps.length - 1 ? 'Finalizar' : 'Próximo';
+                tourOverlay.classList.add('active');
+            }, 400); 
+        }
+
+        tourNextBtn.addEventListener('click', () => { if (currentStep < tourSteps.length - 1) { currentStep++; showStep(currentStep); } else { endTour(); } });
+        tourPrevBtn.addEventListener('click', () => { if (currentStep > 0) { currentStep--; showStep(currentStep); } });
+        tourSkipBtn.addEventListener('click', endTour);
+        openTutorialButton.addEventListener('click', startTour);
+        tourOverlay.addEventListener('click', (e) => { if (e.target === tourOverlay) endTour(); });
+
         // =======================================================================
         // CÓDIGO GERAL DA PLATAFORMA (NAVEGAÇÃO, ETC.)
         // =======================================================================
@@ -509,8 +776,6 @@
 
                         if (trans.type === 'NaoRetirada') {
                             valorParaAlocar += lucroPrejuizoRow;
-                            // ATUALIZAÇÃO: Custo do Saldo = Custo Anterior + (2 * Variação Cambial)
-                            // Para que o resultado final seja (Valor de Mercado + Variação Cambial)
                             custoSaldoBRL += (2 * lucroPrejuizoRow);
                         } else { // É uma 'Retirada' normal
                             totalRetiradoUSD += trans.value;
@@ -740,7 +1005,6 @@
                 
                 let resultado_liquido_usd;
                 if (profit > 0) {
-                    // LÓGICA CORRIGIDA AQUI
                     resultado_liquido_usd = profit - (commission + swap);
                 } else {
                     resultado_liquido_usd = profit;
@@ -871,7 +1135,6 @@
         // =======================================================================
         // FIM DO CÓDIGO PARA A APURAÇÃO ANUAL DE IR
         // =======================================================================
-
     </script>
 </body>
 </html>
