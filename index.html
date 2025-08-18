@@ -98,8 +98,8 @@
         .modal-overlay.active .modal-content { transform: scale(1); }
 
         .highlight-card {
-            border: 1px solid var(--accent-color);
-            box-shadow: 0 0 25px -5px rgba(88, 166, 255, 0.4);
+            border: 1px solid var(--negative-color);
+            box-shadow: 0 0 25px -5px rgba(248, 81, 73, 0.4);
         }
         
         .important-note { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background-color: rgba(210, 153, 34, 0.1); border-left: 4px solid var(--warning-color); }
@@ -241,9 +241,9 @@
                         </button>
                     </div>
                      <div id="alocar-proximo-ano-card" class="alocar-card hidden">
-                        <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
-                        <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
-                    </div>
+                         <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
+                         <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
+                     </div>
                 </div>
                 <div id="results-area-cambial" class="transition-opacity duration-500 mt-12"></div>
             </div>
@@ -277,15 +277,28 @@
                     <div id="printable-report-area">
                         <div id="success-box" class="p-4 mb-4 text-sm rounded-lg bg-green-900 text-green-300 border border-green-700"></div>
                         <h2 class="text-2xl font-bold mb-6">📊 Resultados da Apuração</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                             <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (USD)</p><p id="total-usd" class="text-2xl font-bold text-white mt-1"></p></div>
                             <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (BRL)</p><p id="total-brl" class="text-2xl font-bold text-white mt-1"></p></div>
-                            <div class="card highlight-card"><p class="text-sm font-medium text-text-primary">Imposto Anual Devido (DARF)</p><p id="total-tax" class="text-2xl font-bold text-accent-color mt-1"></p></div>
                         </div>
+                        <div class="card highlight-card text-center p-8 mb-8">
+                            <p class="text-base font-medium text-text-primary uppercase tracking-wider">Imposto Anual Devido (DARF)</p>
+                            <p id="total-tax" class="text-5xl font-extrabold text-negative mt-2"></p>
+                        </div>
+
+                        <div class="card mb-8">
+                            <div class="card-border"></div>
+                            <h3 class="text-lg font-semibold mb-4 text-white">Desempenho Mensal (BRL)</h3>
+                            <div class="h-80">
+                                <canvas id="monthly-performance-chart"></canvas>
+                            </div>
+                        </div>
+
                         <div class="card">
                             <div class="card-border"></div>
                             <h3 class="text-lg font-semibold mb-4 text-white">Calendário Anual de Resultados</h3>
-                            <p class="text-sm mb-6">Clique num mês para ver o detalhe das operações.</p>
+                            <p class="text-sm mb-6">Clique em um mês para ver o detalhe das operações.</p>
                             <div id="calendar-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
                         </div>
                     </div>
@@ -577,7 +590,6 @@
             return null;
         }
 
-        // --- FUNÇÃO CORRIGIDA PARA EVITAR ERROS DE SINTAXE ---
         window.toggleNaoRetiradaOption = function() {
             const dateInput = document.getElementById('trans-date');
             const naoRetiradaOption = document.getElementById('nao-retirada-option');
@@ -587,7 +599,6 @@
                 naoRetiradaOption.disabled = false;
             } else {
                 naoRetiradaOption.disabled = true;
-                // --- VALOR 'Não Retirada' CORRIGIDO ---
                 if (typeSelect.value === 'Não Retirada') {
                     typeSelect.value = 'Envio';
                 }
@@ -607,14 +618,12 @@
             }
             const transactionData = { date: new Date(`${dateInput.value}T00:00:00Z`), type: typeInput.value, value: numericValue };
             if (currentlyEditingIndex !== null) {
-                // --- VALOR 'Não Retirada' CORRIGIDO ---
                 if (currentlyEditingIndex === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'Não Retirada')) {
                     alert('O primeiro lançamento não pode ser editado para "Retirada" ou "Não Retirada".');
                     return;
                 }
                 manualTransactions[currentlyEditingIndex] = transactionData;
             } else {
-                 // --- VALOR 'Não Retirada' CORRIGIDO ---
                 if (manualTransactions.length === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'Não Retirada')) {
                     alert('O primeiro lançamento deve ser obrigatoriamente um ENVIO.');
                     return;
@@ -634,7 +643,7 @@
             document.getElementById('trans-value').value = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(trans.value);
             document.getElementById('add-trans-button').textContent = 'Salvar Alterações';
             document.getElementById('cancel-edit-button').classList.remove('hidden');
-            toggleNaoRetiradaOption(); // --- NOME DA FUNÇÃO CORRIGIDO ---
+            toggleNaoRetiradaOption();
         }
         
         window.cancelEdit = function() {
@@ -644,7 +653,7 @@
             document.getElementById('trans-value').value = '';
             document.getElementById('add-trans-button').textContent = 'Adicionar +';
             document.getElementById('cancel-edit-button').classList.add('hidden');
-            toggleNaoRetiradaOption(); // --- NOME DA FUNÇÃO CORRIGIDO ---
+            toggleNaoRetiradaOption();
         }
 
         window.removeTransaction = function(index) {
@@ -663,13 +672,13 @@
                 const cotacaoDisplay = cotacaoDia ? formatCurrency(cotacaoDia, 'BRL') : `<span class="text-xs text-gray-500">Aguardando arquivo</span>`;
                 const totalBRL = cotacaoDia ? t.value * cotacaoDia : null;
                 const totalBRLDisplay = totalBRL !== null ? formatCurrency(totalBRL, 'BRL') : `<span class="text-xs text-gray-500">---</span>`;
-                const actions = `<div class="flex gap-2"><button onclick="editTransaction(${index})" class="text-warning-color hover:text-white font-semibold text-xs uppercase">Editar</button><button onclick="removeTransaction(${index})" class="text-negative-color hover:text-white font-semibold text-xs uppercase">Remover</button></div>`;
+                const actions = `<div class="flex gap-2 justify-center"><button onclick="editTransaction(${index})" class="text-warning-color hover:text-white font-semibold text-xs uppercase">Editar</button><button onclick="removeTransaction(${index})" class="text-negative-color hover:text-white font-semibold text-xs uppercase">Remover</button></div>`;
                 return [t.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'}), t.type, formatCurrency(t.value, 'USD'), cotacaoDisplay, totalBRLDisplay, actions];
             });
-            let table = `<h4 class="text-md font-semibold mb-2 mt-4 border-t border-border-color pt-4">Registros a Processar:</h4><div class="overflow-x-auto bg-main-bg rounded-md border border-border-color max-h-64"><table class="min-w-full text-sm"><thead><tr class="bg-card-bg">`;
-            headers.forEach(h => table += `<th class="text-left py-2 px-3 font-medium text-gray-400 uppercase tracking-wider">${h}</th>`);
+            let table = `<h4 class="text-md font-semibold mb-2 mt-4 border-t border-border-color pt-4">Registros a Processar:</h4><div class="overflow-x-auto bg-main-bg rounded-md border border-border-color"><table class="min-w-full text-sm"><thead><tr class="bg-card-bg">`;
+            headers.forEach(h => table += `<th class="text-center py-2 px-3 font-medium text-gray-400 uppercase tracking-wider">${h}</th>`);
             table += `</tr></thead><tbody class="divide-y divide-border-color">`;
-            data.forEach(row => { table += `<tr class="hover:bg-card-bg">`; row.forEach(cell => table += `<td class="py-2 px-3 whitespace-nowrap">${cell}</td>`); table += `</tr>`; });
+            data.forEach(row => { table += `<tr class="hover:bg-card-bg">`; row.forEach(cell => table += `<td class="py-2 px-3 whitespace-nowrap text-center">${cell}</td>`); table += `</tr>`; });
             table += `</tbody></table></div>`;
             container.innerHTML = table;
         }
@@ -775,7 +784,10 @@
         function processAndRenderCambial(transactions) {
             try {
                 let saldoUSD = 0, custoSaldoBRL = 0, totalEnviosUSD = 0, totalRetiradoUSD = 0, lucroPrejuizoTotal = 0;
+                let totalEnviosBRL = 0, totalRetiradoBRL = 0;
                 let lucroTributavel = 0;
+                let valorNaoRetiradaBRL = null;
+                let mostrarAlocarCard = false;
                 
                 const detailedData = [];
                 const exportHeaders = ['Data', 'Tipo', 'Valor Líquido (USD)', 'Cotação (USD/BRL)', 'VALOR (BRL)', 'Lucro/Prejuízo com Variação Cambial (R$)', 'Saldo Final (USD)'];
@@ -792,8 +804,9 @@
                         saldoUSD += trans.value;
                         custoSaldoBRL += valorDeMercadoBRL;
                         totalEnviosUSD += trans.value;
+                        totalEnviosBRL += valorDeMercadoBRL;
                         custoOperacaoBRL = valorDeMercadoBRL;
-                    } else { // Retirada ou Não Retirada
+                    } else { 
                         if (trans.value > saldoUSD) throw new Error(`Saque (${formatCurrency(trans.value, 'USD')}) maior que o saldo na data.`);
                         
                         custoOperacaoBRL = trans.value * precoMedioAnterior;
@@ -804,11 +817,16 @@
                             lucroTributavel += lucroPrejuizoRow;
                         }
                         
-                        // --- VALOR 'Não Retirada' CORRIGIDO ---
                         if (trans.type === 'Não Retirada') {
                             custoSaldoBRL += (2 * lucroPrejuizoRow);
-                        } else { // É uma 'Retirada' normal
+                            valorNaoRetiradaBRL = valorDeMercadoBRL;
+                            const isLastDayOfYear = trans.date.getUTCMonth() === 11 && trans.date.getUTCDate() === 31;
+                            if (isLastDayOfYear) {
+                                mostrarAlocarCard = true;
+                            }
+                        } else { 
                             totalRetiradoUSD += trans.value;
+                            totalRetiradoBRL += valorDeMercadoBRL;
                             saldoUSD -= trans.value;
                             custoSaldoBRL -= custoOperacaoBRL;
                         }
@@ -834,16 +852,24 @@
                         </div>
                     `;
                 }
-
-                let valorParaAlocar = custoSaldoBRL;
-                if (valorParaAlocar > 0) {
-                    document.getElementById('alocar-proximo-ano-valor').textContent = formatCurrency(valorParaAlocar);
+                
+                const saldoBRLCalculado = custoSaldoBRL + lucroPrejuizoTotal;
+                let saldoFinalParaExibir;
+                
+                if (valorNaoRetiradaBRL !== null) {
+                    saldoFinalParaExibir = valorNaoRetiradaBRL;
+                } else {
+                    saldoFinalParaExibir = saldoBRLCalculado; 
+                }
+                
+                if (mostrarAlocarCard) {
+                    document.getElementById('alocar-proximo-ano-valor').textContent = formatCurrency(saldoFinalParaExibir);
                     document.getElementById('alocar-proximo-ano-card').classList.remove('hidden');
                 } else {
                     document.getElementById('alocar-proximo-ano-card').classList.add('hidden');
                 }
 
-                const kpiData = { saldoUSD, custoSaldoBRL, totalEnviosUSD, totalRetiradoUSD };
+                const kpiData = { saldoUSD, custoSaldoBRL: saldoFinalParaExibir, totalEnviosUSD, totalRetiradoUSD, totalEnviosBRL, totalRetiradoBRL };
                 const lucroColor = lucroPrejuizoTotal > 0 ? 'text-positive' : lucroPrejuizoTotal < 0 ? 'text-negative' : 'text-white';
                 const resultsContainer = document.getElementById('results-area-cambial');
                 resultsContainer.innerHTML = `
@@ -857,10 +883,12 @@
                                  <p class="text-4xl font-bold ${lucroColor} mt-2">${formatCurrency(lucroPrejuizoTotal)}</p>
                              </div>
                             ${cardsImpostoHtml}
-                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                  <div class="card"><p class="text-sm font-medium text-gray-400">Total Enviado (USD)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalEnviosUSD, 'USD')}</p></div>
                                  <div class="card"><p class="text-sm font-medium text-gray-400">Total Retirado (USD)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalRetiradoUSD, 'USD')}</p></div>
                                  <div class="card"><p class="text-sm font-medium text-gray-400">Saldo Atual (USD)</p><p class="text-2xl font-bold text-accent-color">${formatCurrency(kpiData.saldoUSD, 'USD')}</p></div>
+                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Enviado (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalEnviosBRL)}</p></div>
+                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Retirado (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalRetiradoBRL)}</p></div>
                                  <div class="card"><p class="text-sm font-medium text-gray-400">Saldo Atual (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.custoSaldoBRL)}</p></div>
                              </div>
                              <div class="card p-6">
@@ -869,11 +897,11 @@
                                      <table class="min-w-full">
                                          <thead class="border-b border-border-color">
                                              <tr>
-                                                 ${exportHeaders.map(h => `<th class="text-left py-3 px-4 font-semibold text-sm text-text-primary uppercase tracking-wider">${h}</th>`).join('')}
+                                                 ${exportHeaders.map(h => `<th class="text-center py-3 px-4 font-semibold text-sm text-text-primary uppercase tracking-wider">${h}</th>`).join('')}
                                              </tr>
                                          </thead>
                                          <tbody class="divide-y divide-border-color">
-                                             ${detailedData.map(row => `<tr class="hover:bg-card-bg">${row.map(cell => `<td class="py-4 px-4 whitespace-nowrap text-sm">${cell}</td>`).join('')}</tr>`).join('')}
+                                             ${detailedData.map(row => `<tr class="hover:bg-card-bg">${row.map(cell => `<td class="py-4 px-4 whitespace-nowrap text-center">${cell}</td>`).join('')}</tr>`).join('')}
                                          </tbody>
                                      </table>
                                  </div>
@@ -996,7 +1024,7 @@
                 return { name: 'Metatrader 5 (Relatório de Posições)', map: { data_fechamento: 'Horário', resultado: 'Lucro', comissao: 'Comissão', swap: 'Swap', ativo: 'Ativo' } };
             }
             if (columns.has('n. do trade') && columns.has('datade fechamento')) {
-                return { name: 'Metatrader 5 (Relatório de Negócios)', map: { data_fechamento: 'Datade  Fechamento', resultado: 'Resultado', comissao: 'Comissão', swap: 'Swap', ativo: 'Ativo' } };
+                return { name: 'Metatrader 5 (Relatório de Negócios)', map: { data_fechamento: 'Datade  Fechamento', resultado: 'Resultado', comissao: 'Comissão', swap: 'Swap', ativo: 'Ativo' } };
             }
             if (columns.has('position') && columns.has('type') && columns.has('deal')) {
                 return { name: 'Metatrader 5 (Inglês)', map: { data_fechamento: 'Time', resultado: 'Profit', comissao: 'Commission', swap: 'Swap', ativo: 'Symbol' } };
@@ -1027,9 +1055,9 @@
             if (!quotes || quotes.length === 0) throw new Error("O ficheiro de cotações está vazio ou em formato inválido.");
             
             const quotesDateKey = Object.keys(quotes[0]).find(k => k.toLowerCase().trim().includes('data'));
-            const quotesValueKey = Object.keys(quotes[0]).find(k => k.toLowerCase().trim().includes('cotação'));
+            const quotesCompraKey = Object.keys(quotes[0]).find(k => k.toLowerCase().trim() === 'compra'); 
             
-            if (!quotesDateKey || !quotesValueKey) throw new Error("Não foi possível encontrar as colunas de 'Data' e 'Cotação' no ficheiro de cotações.");
+            if (!quotesDateKey || !quotesCompraKey) throw new Error("Não foi possível encontrar as colunas de 'Data' e 'Compra' no ficheiro de cotações. Verifique o cabeçalho.");
             
             const quotesMap = quotes.reduce((acc, row) => {
                 const dateStr = row[quotesDateKey];
@@ -1042,7 +1070,7 @@
                     const parts = dateStr.split(' ')[0].split('-');
                     date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
                 }
-                if (!isNaN(date.getTime())) acc[date.toISOString().split('T')[0]] = parseFloat(String(row[quotesValueKey]).replace('R$', '').replace(/\s/g, '').replace(',', '.'));
+                if (!isNaN(date.getTime())) acc[date.toISOString().split('T')[0]] = parseFloat(String(row[quotesCompraKey]).replace('R$', '').replace(/\s/g, '').replace(',', '.'));
                 return acc;
             }, {});
 
@@ -1113,7 +1141,7 @@
                 const [year, monthNum] = row.mes.split('-');
                 const monthName = `${monthNames[parseInt(monthNum) - 1]} ${year}`;
                 const card = document.createElement('div');
-                card.className = `month-card ${row.resultado_liquido_usd >= 0 ? 'profit' : 'loss'}`;
+                card.className = `month-card ${row.resultado_liquido_usd >= 0 ? 'profit' : 'loss'} text-center`;
                 card.dataset.month = row.mes;
                 card.innerHTML = `
                     <div class="month-name">${monthName}</div>
@@ -1128,6 +1156,66 @@
             document.getElementById('total-usd').innerHTML = `<span class="${totalUSD >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(totalUSD, 'USD')}</span>`;
             document.getElementById('total-brl').innerHTML = `<span class="${totalBRL >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(totalBRL)}</span>`;
             document.getElementById('total-tax').textContent = formatCurrency(impostoAnual);
+            
+            // --- INÍCIO: Lógica do Gráfico ---
+            const chartCanvas = document.getElementById('monthly-performance-chart');
+            if (window.myPerformanceChart instanceof Chart) {
+                window.myPerformanceChart.destroy();
+            }
+
+            const chartData = {
+                labels: data.map(row => {
+                    const [year, monthNum] = row.mes.split('-');
+                    const monthName = monthNames[parseInt(monthNum) - 1];
+                    return `${monthName.substring(0, 3)}/${year.substring(2, 4)}`;
+                }),
+                datasets: [{
+                    label: 'Resultado Líquido (BRL)',
+                    data: data.map(row => row.resultado_liquido_brl),
+                    backgroundColor: data.map(row => row.resultado_liquido_brl >= 0 ? 'rgba(63, 185, 80, 0.6)' : 'rgba(248, 81, 73, 0.6)'),
+                    borderColor: data.map(row => row.resultado_liquido_brl >= 0 ? 'rgba(63, 185, 80, 1)' : 'rgba(248, 81, 73, 1)'),
+                    borderWidth: 1
+                }]
+            };
+
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#FFFFFF',
+                            callback: function(value, index, values) {
+                                return 'R$ ' + value.toLocaleString('pt-BR');
+                            }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#FFFFFF' },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+            window.myPerformanceChart = new Chart(chartCanvas, { type: 'bar', data: chartData, options: chartOptions });
+            // --- FIM: Lógica do Gráfico ---
+
             resultsSection_IR.classList.remove('hidden');
         }
 
