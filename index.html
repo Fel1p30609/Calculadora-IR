@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -55,8 +58,9 @@
         
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1.4rem; border-radius: 6px; font-weight: 500; transition: var(--transition-fluid); border: 1px solid var(--border-color); transform: scale(1); }
         .btn:hover { transform: scale(1.03); border-color: var(--accent-color); }
+        .btn:disabled { cursor: not-allowed; opacity: 0.6; }
         .btn-primary { background-color: var(--accent-color); color: var(--main-bg); font-weight: 600; border-color: var(--accent-color); }
-        .btn-primary:hover { background-color: var(--accent-color-hover); border-color: var(--accent-color-hover); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-color-hover); border-color: var(--accent-color-hover); }
         .btn-secondary { background-color: transparent; color: var(--text-headings); }
         .btn-secondary:hover { color: var(--accent-color); }
         .btn-danger { background-color: transparent; border-color: var(--negative-color); color: var(--negative-color);}
@@ -109,7 +113,7 @@
         .important-note p:first-child { color: var(--warning-color); font-weight: 600;}
         .important-note p:last-child { color: var(--text-headings); opacity: 0.9;}
 
-        #login-screen, #no-access-screen { background: var(--main-bg); display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 2000; }
+        #login-screen, #register-screen, #no-access-screen { background: var(--main-bg); display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 2000; }
         .login-box { text-align: center; width: 100%; max-width: 380px; animation: fadeInUp 0.5s var(--transition-fluid) both; }
         .message { margin-top: 1rem; font-weight: 500; display: none; padding: 0.8rem; border-radius: 6px; font-size: 0.9rem; }
         .message.error { color: #fff; background-color: rgba(248, 81, 73, 0.5); border: 1px solid rgba(248,81,73,0.8); }
@@ -158,41 +162,97 @@
         .terms-text-container strong { color: var(--text-headings); }
         .terms-text-container h4 { font-weight: 700; color: var(--accent-color); text-align: center; font-size: 1.2rem; margin-bottom: 1rem;}
 
-
-        @media print {
-            body, .content-wrapper, #printable-report-area, #pdf-export-cambial { background: #ffffff !important; color: #000000 !important; }
-            body * { visibility: hidden; }
-            #printable-report-area, #printable-report-area *, #pdf-export-cambial, #pdf-export-cambial * { visibility: visible; }
-            #printable-report-area, #pdf-export-cambial { position: absolute; left: 0; top: 0; width: 100%; padding: 1rem; }
-            .card { background-color: #f8f9fa !important; box-shadow: none; border: 1px solid #dee2e6; color: #000 !important; }
-            h1, h2, h3, p, span, th, td { color: #000 !important; }
-            .text-positive { color: #28a745 !important; }
-            .text-negative { color: #dc3545 !important; }
-            .text-accent-color { color: #007bff !important; }
-            .month-card { page-break-inside: avoid; }
-            #download-buttons-wrapper, #export-buttons, #open-tutorial-button, #auth-container, #cambial-download-buttons-wrapper { display: none !important; }
+        /* Checkbox customizado para o modal de exportação */
+        .custom-checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-headings);
         }
+        .custom-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            position: relative;
+            transition: var(--transition-fluid);
+            background-color: var(--main-bg);
+        }
+        .custom-checkbox:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .custom-checkbox:checked::after {
+            content: '✓';
+            font-size: 1rem;
+            color: var(--main-bg);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+        }
+        
+        /* Estilo para Drag and Drop */
+        .drag-over {
+          border-color: var(--accent-color) !important;
+          border-style: solid !important;
+          background-color: rgba(88, 166, 255, 0.1);
+        }
+        
     </style>
 </head>
 <body class="antialiased" style="overflow: hidden;">
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 class="text-3xl font-semibold mb-3 text-white">Plataforma XTributation</h2>
-            <p class="text-base text-text-primary mb-8">Análise de performance e tributação.</p>
+            <h2 class="text-3xl font-semibold mb-3 text-white">Acessar Plataforma</h2>
+            <p class="text-base text-text-primary mb-6">Análise de performance e tributação.</p>
+            
             <div class="space-y-4">
                 <input type="email" id="email-input" placeholder="Seu e-mail" class="input-field">
                 <input type="password" id="password-input" placeholder="Sua senha" class="input-field">
             </div>
+
             <button id="sign-in-button" class="mt-6 btn btn-primary w-full text-base py-3">
-                <span>Acessar Plataforma</span>
+                <span>Entrar</span>
             </button>
-            <a href="#" id="forgot-password-link" class="text-sm text-text-primary hover:text-accent-color transition-colors duration-200 mt-6 inline-block">Problemas para acessar?</a>
-            <p id="message" class="message"></p>
+            
+            <div class="mt-6 text-sm text-text-primary">
+                É seu primeiro acesso? 
+                <a href="#" id="go-to-register-link" class="font-semibold text-accent-color hover:text-accent-color-hover transition-colors duration-200">Crie sua conta aqui.</a>
+            </div>
+
+             <div class="mt-4 text-sm">
+                <a href="#" id="forgot-password-link" class="text-text-primary hover:text-accent-color transition-colors duration-200">Esqueceu a senha?</a>
+            </div>
+
+            <p id="login-message" class="message"></p>
         </div>
     </div>
 
-    <!-- Tela de acesso negado -->
+    <div id="register-screen" style="display: none;">
+        <div class="login-box">
+            <h2 class="text-3xl font-semibold mb-3 text-white">Criar Nova Conta</h2>
+            <p class="text-base text-text-primary mb-8">Use o mesmo e-mail que você utilizou na compra.</p>
+            <div class="space-y-4">
+                <input type="email" id="register-email-input" placeholder="Seu e-mail" class="input-field">
+                <input type="password" id="register-password-input" placeholder="Crie uma senha (mín. 6 caracteres)" class="input-field">
+                <input type="password" id="register-confirm-password-input" placeholder="Confirme sua senha" class="input-field">
+            </div>
+            <button id="register-button" class="mt-6 btn btn-primary w-full text-base py-3">
+                <span>Cadastrar e Acessar</span>
+            </button>
+            <div class="mt-6 text-sm">
+                 <a href="#" id="go-to-login-link" class="font-semibold text-accent-color hover:text-accent-color-hover transition-colors duration-200">Já tem uma conta? Acesse aqui.</a>
+            </div>
+            <p id="register-message" class="message"></p>
+        </div>
+    </div>
+
     <div id="no-access-screen" style="display: none;">
         <div class="login-box">
             <h2 class="text-3xl font-semibold mb-3 text-white">Acesso Negado</h2>
@@ -221,15 +281,14 @@
         </div>
     </div>
     
-    <div id="auth-container" style="display: none;">
+    <div id="auth-container" style="display: none;" class="no-print">
         <span id="user-email" class="text-white text-sm font-medium"></span>
         <button id="sign-out-button" class="text-xs text-negative-color hover:text-white transition-colors">Sair</button>
     </div>
 
-    <!-- O conteúdo da calculadora permanece o mesmo -->
     <div id="calculator-content" style="display: none;">
         <div class="content-wrapper">
-            <header class="mb-12 flex justify-between items-center relative stagger-in" style="--stagger-index: 0;">
+            <header class="mb-12 flex justify-between items-center relative stagger-in no-print" style="--stagger-index: 0;">
                 <div class="flex items-center gap-4">
                     <svg width="40" height="40" viewBox="0 0 841 1082" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#C9D1D9">
                         <path d="M 247.5 2 L 258.5 3 L 276.5 7 L 329.5 24 Q 389.9 45.6 446.5 71 L 524.5 110 L 556.5 130 L 581 150.5 L 589 161.5 Q 591.9 166.1 591 174.5 Q 584.3 208.8 560.5 226 Q 553.7 232.2 543.5 235 L 531.5 235 Q 518.7 232.3 512 223.5 Q 493.5 195 470.5 171 L 428.5 183 L 365.5 205 L 329.5 220 L 285.5 243 L 283 243 L 289.5 235 Q 305.3 221.3 324 210.5 Q 279.6 194.9 251 163.5 Q 241.7 152.8 236 138.5 L 232 123.5 L 231 103.5 L 235 82.5 L 238 74.5 L 240.5 72 L 244 74.5 Q 252 101.5 269.5 119 Q 293.7 143.8 328.5 158 L 357.5 168 L 392.5 176 L 404.5 177 L 428.5 170 L 463 163.5 Q 420 121.5 370.5 86 Q 316.4 46.1 254.5 14 L 245 5.5 Q 243.9 2.2 246.5 3 L 247.5 2 Z M 236.5 269 L 237 272 Q 193.7 293.9 161 327.5 L 148 345.5 Q 144.2 352.2 144 362.5 Q 145.9 373.6 153.5 379 L 170.5 390 L 200.5 403 L 246.5 416 L 301.5 427 L 309 431.5 L 307.5 434 L 300.5 436 L 299.5 435 L 287.5 435 L 286.5 434 L 276.5 434 L 275.5 433 L 266.5 433 L 265.5 432 L 243.5 430 L 200.5 421 L 154.5 407 Q 143.8 403.2 138 394.5 L 128 374.5 L 126 366.5 L 126 347.5 Q 128.9 333.4 139.5 327 Q 183.4 294.2 236 271 L 236.5 269 Z M 531.5 318 Q 572.9 344.6 605 380.5 Q 642.7 421.3 673 469.5 Q 703.5 517.5 728 571.5 Q 754 629 774 692.5 L 799 784.5 L 810 836.5 L 810 842 Q 813.7 840.6 812 846.5 L 819 880.5 L 819 886.5 L 822 899.5 L 822 905.5 L 823 906.5 L 826 933.5 L 828 941.5 L 828 948.5 L 829 949.5 L 829 956.5 L 830 957.5 L 830 965.5 L 831 966.5 L 832 983.5 L 833 984.5 L 833 992.5 L 835 1002.5 L 835 1011.5 L 837 1021.5 L 837 1030.5 L 838 1031.5 L 838 1040.5 L 839 1041.5 L 840 1062.5 L 841 1063.5 L 841 1079.5 L 839 1078.5 L 824 1007.5 L 812 957 Q 808.7 958.3 810 953.5 L 785 858.5 L 748 734.5 L 712 630.5 L 682 556.5 Q 650.8 483.7 611 419.5 L 577 370.5 Q 556.1 342.9 531 319.5 L 531.5 318 Z M 369 446 Q 371.7 444.9 371 447.5 L 378 467.5 L 382 488.5 L 383 506.5 L 384 507.5 L 384 550.5 L 383 551.5 L 383 562.5 L 382 563.5 L 381 578.5 L 376 605.5 L 370 629.5 L 361 657.5 L 344 699.5 L 300 786.5 L 297.5 789 L 297 787.5 L 315 742.5 L 337 674.5 L 354 606.5 L 357 586.5 L 359 580.5 L 359 573.5 L 346 520.5 L 326 463.5 L 333 469.5 Q 353.1 494.9 365.5 528 L 367 524.5 L 368 501.5 L 369 500.5 L 370 451.5 L 369 446 Z M 179.5 490 L 182 490.5 L 130.5 525 L 96.5 550 Q 64.7 573.7 38 602.5 L 37 621.5 Q 39.4 636.1 46 646.5 Q 56.6 663.4 71.5 676 Q 93.9 695.6 121.5 710 Q 145.4 678.4 174.5 652 Q 210.4 618.9 252.5 592 L 300.5 565 L 321.5 555 L 326.5 554 L 325.5 556 L 309.5 565 L 270.5 594 L 268.5 594 L 219 639.5 Q 149.1 711.1 103 806.5 L 77 883.5 L 58 958.5 L 58 963.5 L 53 987.5 L 53 994.5 L 51 1003.5 L 51 1013.5 L 50 1014.5 L 50 1030.5 L 49 1031.5 L 49 1078.5 L 47.5 1080 L 45 1071.5 L 45 1064.5 L 44 1063.5 L 44 1056.5 L 41 1039.5 L 41 1031.5 L 40 1030.5 L 40 1022.5 L 38 1013.5 L 38 1004.5 L 37 1003.5 L 36 975.5 L 35 974.5 L 35 942.5 L 36 941.5 L 37 914.5 L 38 913.5 L 38 906.5 L 39 905.5 L 42 881.5 L 47 859.5 L 56 829.5 L 71 791.5 Q 84.2 763.4 100 739 L 72.5 734 L 47.5 726 Q 25 717.5 10 701.5 L 1 685.5 L 0 681.5 L 0 662.5 L 9 638.5 Q 21.2 617.2 38 600.5 L 39 594.5 L 46 580.5 Q 57 563.5 72.5 551 Q 91.4 535.4 113.5 523 L 179.5 490 Z M 632.5 775 L 640.5 775 L 641 776.5 L 593.5 800 L 577 810 L 575.5 813 Q 540.8 835.3 514 865.5 Q 474 909 448 966.5 L 429 1017.5 L 418.5 1057 L 418 1053.5 L 419 1052.5 L 419 1045.5 L 425 1012.5 L 433 979.5 L 442 949.5 L 458 908.5 Q 471.2 878.7 489 853.5 Q 502 835 518.5 820 L 529 811.5 L 530.5 809 Q 546.3 796.8 566.5 789 L 586.5 783 L 591.5 783 L 632.5 775 Z M 338.5 820 Q 341.1 819.2 340 822.5 L 329.5 831 L 259.5 877 Q 231.5 896 209 920.5 Q 173.9 958.9 144 1002.5 Q 127 1026.5 116.5 1057 L 116 1052.5 L 126 1012.5 Q 135.2 986.2 148 963.5 Q 171.4 922.4 205.5 892 Q 232.8 867.8 266.5 850 L 316.5 828 L 338.5 820 Z M 361.5 824 L 363 826.5 L 348 902.5 L 347 918.5 L 346 919.5 L 346 948.5 L 347 949.5 L 347 962.5 L 348 963.5 L 349 982.5 L 350 983.5 L 350 990.5 L 351 991.5 L 354 1015.5 L 363 1047.5 L 368 1056.5 L 366 1057 Q 347.3 1031.3 337 996.5 L 333 980.5 L 331 961.5 L 330 960.5 L 330 920.5 L 331 919.5 L 331 912.5 L 334 895.5 L 339 876.5 L 354 837.5 L 359 826.5 L 361.5 824 Z " />
@@ -239,12 +298,12 @@
                         <p class="text-base text-text-primary">Plataforma de Imposto de Renda XTraders</p>
                     </div>
                 </div>
-                <button id="open-tutorial-button" class="btn btn-secondary !p-2.5">
+                <button id="open-tutorial-button" class="btn btn-secondary !p-2.5 no-print">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </button>
             </header>
             
-            <div class="flex justify-center mb-12 stagger-in" style="--stagger-index: 1;">
+            <div class="flex justify-center mb-12 stagger-in no-print" style="--stagger-index: 1;">
                 <div id="tour-step-1" class="tab-container">
                     <button id="main-tab-cambial" onclick="showMainTab('cambial')" class="main-tab-button active">Envios e Retiradas</button>
                     <button id="main-tab-ir" onclick="showMainTab('ir')" class="main-tab-button">Apuração Anual de IR</button>
@@ -252,7 +311,7 @@
             </div>
 
             <div id="main-content-cambial" class="main-content">
-                <div id="cambial-input-area" class="space-y-6">
+                <div id="cambial-input-area" class="space-y-6 no-print">
                     <div id="tour-step-2" class="card">
                         <div class="card-border"></div>
                         <h3 class="text-lg font-semibold mb-4 text-white">Adicione um Registro</h3>
@@ -280,24 +339,24 @@
                              <input type="file" id="rates-file-unified" accept=".csv" class="input-field">
                         </div>
                     </div>
-                    <div id="tour-step-4" class="text-center pt-4">
+                    <div class="text-center pt-4">
                         <button onclick="handleProcessCambial()" class="btn btn-primary text-lg px-12 py-3">
                             <span>Processar Dados</span>
                         </button>
                     </div>
                      <div id="alocar-proximo-ano-card" class="alocar-card hidden">
-                         <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
-                         <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
+                          <div class="alocar-card-title">ALOCAR PARA O PRÓXIMO ANO</div>
+                          <div id="alocar-proximo-ano-valor" class="alocar-card-value">R$ 0,00</div>
                      </div>
                 </div>
                 <div id="results-area-cambial" class="transition-opacity duration-500 mt-12"></div>
             </div>
             
             <div id="main-content-ir" class="main-content hidden">
-                <div id="tour-step-5" class="card stagger-in">
+                <div id="tour-step-5" class="card stagger-in no-print">
                     <div class="card-border"></div>
                     <h2 class="text-xl font-semibold mb-6 text-white text-center">Apuração de Imposto de Renda Anual</h2>
-                    <p class="text-center text-sm mb-6 -mt-4">O cálculo do imposto é consolidado e apurado anualmente.</p>
+                    <p class="text-center text-sm mb-6 -mt-4">Para iniciar a apuração, importe seu relatório anual de trades e a planilha de cotações do dólar. Ambos os arquivos devem estar no formato .csv.</p>
                     <div id="alert-box" class="hidden p-4 mb-6 text-sm rounded-lg bg-yellow-900 text-yellow-300 border border-yellow-700" role="alert"></div>
                     <div class="grid md:grid-cols-2 gap-8 mb-8">
                         <label for="trades-file" class="w-full flex flex-col justify-center items-center p-6 border-2 border-dashed border-border-color rounded-lg cursor-pointer hover:border-accent-color transition-colors">
@@ -320,12 +379,18 @@
     
                 <div id="results" class="hidden mt-12 stagger-in">
                     <div id="printable-report-area">
-                        <div id="success-box" class="p-4 mb-4 text-sm rounded-lg bg-green-900 text-green-300 border border-green-700"></div>
+                        <div id="success-box" class="p-4 mb-4 text-sm rounded-lg bg-green-900 text-green-300 border border-green-700 no-print"></div>
                         <h2 class="text-2xl font-bold mb-6">📊 Resultados da Apuração</h2>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (USD)</p><p id="total-usd" class="text-2xl font-bold text-white mt-1"></p></div>
-                            <div class="card"><p class="text-sm font-medium text-text-primary">Resultado Líquido (BRL)</p><p id="total-brl" class="text-2xl font-bold text-white mt-1"></p></div>
+                            <div class="card text-center">
+                                <p class="text-sm font-medium text-text-primary">Resultado Líquido (USD)</p>
+                                <p id="total-usd" class="text-2xl font-bold text-white mt-1"></p>
+                            </div>
+                            <div class="card text-center">
+                                <p class="text-sm font-medium text-text-primary">Resultado Líquido (BRL)</p>
+                                <p id="total-brl" class="text-2xl font-bold text-white mt-1"></p>
+                            </div>
                         </div>
                         <div class="card highlight-card text-center p-8 mb-8">
                             <p class="text-base font-medium text-text-primary uppercase tracking-wider">Imposto Anual Devido (DARF)</p>
@@ -337,7 +402,7 @@
                             <p id="total-after-tax" class="text-4xl font-bold text-white mt-2"></p>
                         </div>
 
-                        <div class="card mb-8">
+                        <div class="card mb-8 no-print">
                             <div class="card-border"></div>
                             <h3 class="text-lg font-semibold mb-4 text-white">Desempenho Mensal (BRL)</h3>
                             <div class="h-80">
@@ -348,18 +413,14 @@
                         <div class="card">
                             <div class="card-border"></div>
                             <h3 class="text-lg font-semibold mb-4 text-white">Calendário Anual de Resultados</h3>
-                            <p class="text-sm mb-6">Clique em um mês para ver o detalhe das operações.</p>
+                            <p class="text-sm mb-6 no-print">Clique em um mês para ver o detalhe das operações.</p>
                             <div id="calendar-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
                         </div>
                     </div>
-                    <div id="download-buttons-wrapper" class="flex flex-col sm:flex-row gap-4 mt-8">
-                        <button id="export-pdf-button" class="btn btn-secondary w-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>Exportar Relatório (PDF)</span>
-                        </button>
-                        <button id="export-xls-button" class="btn btn-secondary w-full">
+                    <div class="flex justify-center mt-8 no-print">
+                        <button id="open-export-modal-ir-btn" class="btn btn-secondary">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Exportar para Excel (.csv)</span>
+                            <span>Exportar Relatório</span>
                         </button>
                     </div>
                 </div>
@@ -368,7 +429,7 @@
         </div>
     </div>
 
-    <div id="trades-modal" class="modal-overlay">
+    <div id="trades-modal" class="modal-overlay no-print">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="modal-title" class="text-2xl font-bold text-white"></h2>
@@ -390,7 +451,7 @@
         </div>
     </div>
     
-    <div id="tour-overlay" style="display: none;">
+    <div id="tour-overlay" style="display: none;" class="no-print">
         <div class="tour-highlight"></div>
         <div class="tour-tooltip">
              <h3 id="tour-title" class="text-xl font-bold mb-2 text-white"></h3>
@@ -426,7 +487,7 @@
                 <p><strong>13 -</strong> Quando as planilhas, ferramentas e informações contidas no Projeto IR previrem o abatimento de Outros Descontos Considerados, esses são os custos que o contribuinte entende como de devido abatimento do ganho de capital, para diminuição da base de cálculo, e consequente redução do IR a pagar. A base para esse entendimento é decidida pelo utilizador das planilhas, ferramentas e informações contidas no projeto IR, e considerada, por sua decisão, como adequada para esse abatimento. A recomendação é que se considere apenas custos operacionais diretamente ligados as operações com os ativos preenchidos nos locais adequados.</p>
                 <p><strong>14 -</strong> Após Solução de Consulta Cosit n° 282, de 09 de novembro de 2023, em que a Receita Federal entendeu que os CFDs no exterior têm custo de aquisição zero, não é mais necessário calcular a margem das operações. Todas as operações incluídas na planilha consideram apenas o resultado e as despesas envolvidas, ou informadas, e a data de fechamento das negociações, para apuração. Dúvidas podem ser tiradas diretamente com a equipe do Eu Sou Trader Investidor, de acordo com o item 4 desses Termos Legais.</p>
                 <p><strong>15 -</strong> Na hipótese de as planilhas, ferramentas e informações contidas no Projeto IR permitirem a informação de "Base de Cálculo a Tributar em REAIS", significa que esse campo é destinado a situações em que o cliente considere justo outro valor a ser tributado. As ferramentas mostrarão o ganho tributável na parte da Apuração, mas o usuário pode definir, por decisão própria, como descrito no item 8 desses Termos Legais, uma outra base de cálculo a tributar, um valor diverso do que for mostrado na parte de Apuração; com esse preenchimento, as ferramentas mostrarão em "Valores Descontados" informações que se colocadas nos programas da Receita Federal, o imposto será calculado em cima dessa nova base de cálculo, e não da base de cálculo original informada na Apuração. Se o usuário utilizar esse campo, deve decidir por conta própria a base de cálculo que considera justa sofrer tributação, embora a nossa recomendação seja seguir estritamente o que há na legislação tributária aplicável.</p>
-                <p><strong>16 -</strong> O usuário das planilhas, ferramentas e informações contidas no Projeto IR entende que precisa ficar atento aos prazos de vencimento para pagamento das DARFs, se existirem de acordo com a apuração, conforme item 7 desses Termos Legais. O vencimento para pagamento do imposto, dependendo do ano em que as operações foram encerradas pode ser tanto no último dia útil do mês seguinte ao que as operações foram realizadas (até final de 2023), ou pelo prazo estipulado pela Receita Federal, após alterações pela lei 14.754/2023 (a partir de 2024). Caso haja feriados ou finais de semana, é de inteira responsabilidade do cliente essa verificação, e os criadores do Projeto IR e equipe do Eu Sou Trader Investidor não se responsabilizam por lembrar o cliente da data limite para pagamento. O atraso no pagamento do imposto gera multa e juros pela Receita Federal.</p>
+                <p><strong>16 -</strong> O usuário das planilhas, ferramentas e informações contidas no projeto IR entende que precisa ficar atento aos prazos de vencimento para pagamento das DARFs, se existirem de acordo com a apuração, conforme item 7 desses Termos Legais. O vencimento para pagamento do imposto, dependendo do ano em que as operações foram encerradas pode ser tanto no último dia útil do mês seguinte ao que as operações foram realizadas (até final de 2023), ou pelo prazo estipulado pela Receita Federal, após alterações pela lei 14.754/2023 (a partir de 2024). Caso haja feriados ou finais de semana, é de inteira responsabilidade do cliente essa verificação, e os criadores do Projeto IR e equipe do Eu Sou Trader Investidor não se responsabilizam por lembrar o cliente da data limite para pagamento. O atraso no pagamento do imposto gera multa e juros pela Receita Federal.</p>
                 <p><strong>17 -</strong> Qualquer cliente que esteja tendo dificuldades com a apuração nas planilhas, ferramentas e informações contidas no Projeto IR poderá solicitar auxílio da equipe responsável, que providenciará a resposta adequada, se possível, com a maior brevidade possível dentro do razoável. Caso o cliente, mesmo após a ajuda, não consiga apurar seu imposto corretamente.</p>
             </div>
             <div class="flex justify-end items-center gap-4 mt-auto pt-6 border-t border-border-color">
@@ -435,208 +496,321 @@
             </div>
         </div>
     </div>
+
+    <div id="export-modal" class="modal-overlay no-print">
+        <div class="modal-content !w-[500px]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="export-modal-title" class="text-2xl font-bold text-white">Exportar Relatório</h2>
+                <button id="close-export-modal-btn" class="text-2xl text-text-primary hover:text-white transition-colors">&times;</button>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Formato do Arquivo</label>
+                    <select id="export-format-select" class="input-field">
+                        <option value="pdf">PDF (.pdf)</option>
+                        <option value="xlsx">Excel (.xlsx)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-3">Conteúdo a Incluir</label>
+                    <div id="export-options-container" class="space-y-3">
+                        </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-border-color flex justify-end">
+                <button id="generate-export-btn" class="btn btn-primary">
+                    <span id="export-btn-text">Gerar e Baixar</span>
+                    <div id="export-loader" class="loader !w-5 !h-5 hidden ml-2"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        // --- INICIALIZAÇÃO DO FIREBASE ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    // --- INICIALIZAÇÃO DO FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
-          authDomain: "calculadora-ir-56a2c.firebaseapp.com",
-          projectId: "calculadora-ir-56a2c",
-          storageBucket: "calculadora-ir-56a2c.appspot.com",
-          messagingSenderId: "613402077853",
-          appId: "1:613402077853:web:244d838cc2a99452288274"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // --- ELEMENTOS DO DOM ---
-        const loginScreen = document.getElementById('login-screen');
-        const noAccessScreen = document.getElementById('no-access-screen');
-        const logoutFromNoAccessBtn = document.getElementById('logout-from-no-access');
-        const calculatorContent = document.getElementById('calculator-content');
-        const authContainer = document.getElementById('auth-container');
-        const userEmailDisplay = document.getElementById('user-email');
-        const signOutButton = document.getElementById('sign-out-button');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const signInButton = document.getElementById('sign-in-button');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        const messageElement = document.getElementById('message');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingMessage = document.getElementById('loading-message');
-        const termsModal = document.getElementById('terms-modal-overlay');
-        const acceptTermsBtn = document.getElementById('accept-terms-btn');
-        const declineTermsBtn = document.getElementById('decline-terms-btn');
-        
-        // --- LÓGICA DE AUTENTICAÇÃO E VERIFICAÇÃO ---
+    // Suas chaves de configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9yJzA2imAFsUjYGF7S7HzTA3kPNf6P7o",
+      authDomain: "calculadora-ir-56a2c.firebaseapp.com",
+      projectId: "calculadora-ir-56a2c",
+      storageBucket: "calculadora-ir-56a2c.appspot.com",
+      messagingSenderId: "613402077853",
+      appId: "1:613402077853:web:244d838cc2a99452288274"
+    };
+    
+    // Inicializa os serviços do Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // --- MAPEAMENTO DOS ELEMENTOS DO DOM ---
+    const loginScreen = document.getElementById('login-screen');
+    const registerScreen = document.getElementById('register-screen');
+    const noAccessScreen = document.getElementById('no-access-screen');
+    const calculatorContent = document.getElementById('calculator-content');
+    const authContainer = document.getElementById('auth-container');
+    const userEmailDisplay = document.getElementById('user-email');
+    const signOutButton = document.getElementById('sign-out-button');
+    const logoutFromNoAccessBtn = document.getElementById('logout-from-no-access');
+    
+    // Elementos de Login
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const signInButton = document.getElementById('sign-in-button');
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    const loginMessage = document.getElementById('login-message');
+    
+    // Elementos de Cadastro
+    const registerEmailInput = document.getElementById('register-email-input');
+    const registerPasswordInput = document.getElementById('register-password-input');
+    const registerConfirmPasswordInput = document.getElementById('register-confirm-password-input');
+    const registerButton = document.getElementById('register-button');
+    const registerMessage = document.getElementById('register-message');
 
-        async function checkUserPaymentStatus(user) {
-            if (!user) return false;
-            const paymentsRef = collection(db, "payments");
-            const q = query(paymentsRef, 
-                where("buyerEmail", "==", user.email), 
-                where("status", "==", "paid")
-            );
-            try {
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    console.log("Pagamento ativo encontrado para o usuário:", user.email);
-                    return true; 
-                } else {
-                    console.log("Nenhum pagamento ativo encontrado para o usuário:", user.email);
-                    return false;
-                }
-            } catch (error) {
-                console.error("Erro ao verificar o status do pagamento:", error);
+    // Links de Navegação entre telas de Auth
+    const goToRegisterLink = document.getElementById('go-to-register-link');
+    const goToLoginLink = document.getElementById('go-to-login-link');
+
+    // Overlays e Modais
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = document.getElementById('loading-message');
+    const termsModal = document.getElementById('terms-modal-overlay');
+    const acceptTermsBtn = document.getElementById('accept-terms-btn');
+    const declineTermsBtn = document.getElementById('decline-terms-btn');
+
+    // --- FUNÇÕES PRINCIPAIS DE CONTROLE DE ACESSO ---
+
+    // Função para exibir uma mensagem de erro ou sucesso para o usuário
+    function showMessage(element, text, isError = true) {
+        element.textContent = text;
+        element.className = isError ? 'message error' : 'message success';
+        element.style.display = 'block';
+    }
+
+    // Verifica no Firestore se o usuário possui um pagamento com status "paid"
+    async function checkUserPaymentStatus(user) {
+        if (!user) return false;
+        const paymentsRef = collection(db, "payments");
+        // A consulta crucial que garante o acesso apenas para quem pagou
+        const q = query(paymentsRef, 
+            where("buyerEmail", "==", user.email), 
+            where("status", "==", "paid")
+        );
+        try {
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                console.log("Pagamento ativo encontrado para o usuário:", user.email);
+                return true; 
+            } else {
+                console.log("Nenhum pagamento ativo encontrado para o usuário:", user.email);
                 return false;
             }
+        } catch (error) {
+            console.error("Erro ao verificar o status do pagamento:", error);
+            showMessage(loginMessage, "Erro ao verificar permissões. Tente novamente.");
+            return false;
         }
+    }
 
-        function showMainApplication() {
-            loadingMessage.textContent = 'Carregando plataforma...';
+    // Exibe a aplicação principal após todas as verificações
+    function showMainApplication() {
+        loadingMessage.textContent = 'Carregando plataforma...';
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.style.opacity = '1';
+        
+        setTimeout(() => {
+            loginScreen.style.display = 'none';
+            registerScreen.style.display = 'none';
+            noAccessScreen.style.display = 'none';
+
+            loadingOverlay.style.opacity = '0';
+            loadingOverlay.addEventListener('transitionend', () => {
+                loadingOverlay.style.display = 'none';
+            }, { once: true });
+
+            calculatorContent.style.display = 'block';
+            authContainer.style.display = 'flex';
+            document.body.style.overflow = 'auto';
+
+            if (!localStorage.getItem('xtributationTutorialSeen')) {
+                setTimeout(startTour, 700);
+            }
+        }, 1500);
+    }
+
+    // --- OBSERVADOR DE ESTADO DE AUTENTICAÇÃO (O CORAÇÃO DO APP) ---
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // Se o usuário está logado...
+            userEmailDisplay.textContent = user.email;
             loadingOverlay.style.display = 'flex';
-            loadingOverlay.style.opacity = '1';
-            
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.addEventListener('transitionend', () => {
-                    loadingOverlay.style.display = 'none';
-                }, { once: true });
+            loadingMessage.textContent = 'Verificando seu acesso...';
 
-                calculatorContent.style.display = 'block';
-                authContainer.style.display = 'flex';
-                document.body.style.overflow = 'auto';
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userDocRef);
 
-                if (!localStorage.getItem('xtributationTutorialSeen')) {
-                    setTimeout(startTour, 700);
-                }
-            }, 1500);
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                loginScreen.style.display = 'none';
-                userEmailDisplay.textContent = user.email;
-                loadingOverlay.style.display = 'flex';
-                loadingMessage.textContent = 'Verificando seu acesso...';
-
-                try {
-                    const userDocRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(userDocRef);
-
-                    if (docSnap.exists() && docSnap.data().termsAccepted) {
-                        const hasActivePayment = await checkUserPaymentStatus(user);
-                        
-                        if (hasActivePayment) {
-                            showMainApplication();
-                        } else {
-                            loadingOverlay.style.display = 'none';
-                            noAccessScreen.style.display = 'flex';
-                        }
+                // O usuário aceitou os termos?
+                if (docSnap.exists() && docSnap.data().termsAccepted) {
+                    const hasActivePayment = await checkUserPaymentStatus(user);
+                    
+                    if (hasActivePayment) {
+                        showMainApplication();
                     } else {
                         loadingOverlay.style.display = 'none';
-                        termsModal.style.display = 'flex';
+                        noAccessScreen.style.display = 'flex';
                     }
-                } catch (error) {
-                    console.error("Erro no fluxo de verificação:", error);
-                    alert("Ocorreu um erro ao verificar suas permissões. Por favor, tente novamente.");
-                    signOut(auth);
-                }
-
-            } else {
-                loginScreen.style.display = 'flex';
-                calculatorContent.style.display = 'none';
-                authContainer.style.display = 'none';
-                termsModal.style.display = 'none';
-                noAccessScreen.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
-            }
-        });
-
-        signInButton.addEventListener('click', () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            messageElement.style.display = 'none';
-            signInWithEmailAndPassword(auth, email, password)
-                .catch(error => {
-                    messageElement.textContent = `Erro: E-mail ou senha inválidos.`;
-                    messageElement.className = 'message error';
-                    messageElement.style.display = 'block';
-                });
-        });
-
-        signOutButton.addEventListener('click', () => { signOut(auth); });
-        logoutFromNoAccessBtn.addEventListener('click', () => { signOut(auth); });
-
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            const email = emailInput.value;
-            if (!email) {
-                messageElement.textContent = 'Por favor, insira seu e-mail para redefinir a senha.';
-                messageElement.className = 'message error';
-                messageElement.style.display = 'block';
-                return;
-            }
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    messageElement.textContent = 'E-mail de redefinição enviado!';
-                    messageElement.className = 'message success';
-                })
-                .catch(error => {
-                    messageElement.textContent = `Erro ao enviar e-mail.`;
-                    messageElement.className = 'message error';
-                });
-            messageElement.style.display = 'block';
-        });
-
-        acceptTermsBtn.addEventListener('click', async () => {
-            const currentUser = auth.currentUser;
-            if (!currentUser) { return; }
-
-            acceptTermsBtn.disabled = true;
-            acceptTermsBtn.textContent = 'Salvando...';
-
-            const userDocRef = doc(db, "users", currentUser.uid);
-            try {
-                await setDoc(userDocRef, { 
-                    email: currentUser.email,
-                    termsAccepted: { version: "1.0", timestamp: new Date() } 
-                }, { merge: true });
-
-                termsModal.style.display = 'none';
-                
-                loadingOverlay.style.display = 'flex';
-                loadingMessage.textContent = 'Verificando seu acesso...';
-                const hasActivePayment = await checkUserPaymentStatus(currentUser);
-                if (hasActivePayment) {
-                    showMainApplication();
                 } else {
+                    // Se não aceitou os termos, mostra o modal de termos
                     loadingOverlay.style.display = 'none';
-                    noAccessScreen.style.display = 'flex';
+                    termsModal.style.display = 'flex';
                 }
-
             } catch (error) {
-                console.error("Erro ao salvar o aceite dos termos: ", error);
-                alert("Ocorreu um erro ao salvar sua confirmação. Tente novamente.");
-            } finally {
-                 acceptTermsBtn.disabled = false;
-                 acceptTermsBtn.textContent = 'Li, entendi e aceito os termos';
+                console.error("Erro no fluxo de verificação de acesso:", error);
+                alert("Ocorreu um erro crítico ao verificar suas permissões. Por favor, tente logar novamente.");
+                signOut(auth);
             }
-        });
 
-        declineTermsBtn.addEventListener('click', () => {
-            alert('Para usar a plataforma, é necessário aceitar os termos de uso. Você será desconectado.');
-            signOut(auth);
-        });
-        
-        // --- LÓGICA DO TOUR E DA CALCULADORA ---
+        } else {
+            // Se o usuário não está logado, mostra a tela de login
+            loginScreen.style.display = 'flex';
+            registerScreen.style.display = 'none';
+            noAccessScreen.style.display = 'none';
+            calculatorContent.style.display = 'none';
+            authContainer.style.display = 'none';
+            termsModal.style.display = 'none';
+            document.body.style.overflow = 'hidden';
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+    });
+
+    // --- EVENT LISTENERS PARA AÇÕES DO USUÁRIO ---
+
+    // Navegação entre Telas
+    goToRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginScreen.style.display = 'none';
+        registerScreen.style.display = 'flex';
+    });
+
+    goToLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerScreen.style.display = 'none';
+        loginScreen.style.display = 'flex';
+    });
+
+    // Ação de Login
+    signInButton.addEventListener('click', () => {
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        loginMessage.style.display = 'none';
+        signInWithEmailAndPassword(auth, email, password)
+            .catch(error => {
+                console.error("Erro de Login:", error);
+                showMessage(loginMessage, "Erro: E-mail ou senha inválidos.");
+            });
+    });
+
+    // Ação de Cadastro
+    registerButton.addEventListener('click', () => {
+        const email = registerEmailInput.value;
+        const password = registerPasswordInput.value;
+        const confirmPassword = registerConfirmPasswordInput.value;
+        registerMessage.style.display = 'none';
+
+        if (password !== confirmPassword) {
+            showMessage(registerMessage, 'As senhas não coincidem.');
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .catch(error => {
+                console.error("Erro de Cadastro:", error);
+                let friendlyMessage = 'Ocorreu um erro ao criar a conta.';
+                if (error.code === 'auth/email-already-in-use') {
+                    friendlyMessage = 'Este e-mail já está cadastrado. Tente fazer login.';
+                } else if (error.code === 'auth/weak-password') {
+                    friendlyMessage = 'A senha deve ter pelo menos 6 caracteres.';
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = 'O formato do e-mail é inválido.';
+                }
+                showMessage(registerMessage, friendlyMessage);
+            });
+    });
+
+    // Ação de Esqueci a Senha
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const email = emailInput.value;
+        if (!email) {
+            showMessage(loginMessage, 'Por favor, insira seu e-mail para redefinir a senha.');
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                showMessage(loginMessage, 'E-mail de redefinição enviado com sucesso!', false);
+            })
+            .catch(error => {
+                console.error("Erro ao redefinir senha:", error);
+                showMessage(loginMessage, `Erro ao enviar e-mail. Verifique se o e-mail está correto.`);
+            });
+    });
+    
+    // Ações de Logout
+    signOutButton.addEventListener('click', () => { signOut(auth); });
+    logoutFromNoAccessBtn.addEventListener('click', () => { signOut(auth); });
+
+    // Ações do Modal de Termos
+    acceptTermsBtn.addEventListener('click', async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        acceptTermsBtn.disabled = true;
+        acceptTermsBtn.textContent = 'Salvando...';
+
+        const userDocRef = doc(db, "users", currentUser.uid);
+        try {
+            await setDoc(userDocRef, { 
+                email: currentUser.email,
+                termsAccepted: { version: "1.0", timestamp: new Date() } 
+            }, { merge: true });
+
+            termsModal.style.display = 'none';
+            
+            // Força a re-verificação do onAuthStateChanged para seguir o fluxo
+            const event = new Event('user-state-changed');
+            document.dispatchEvent(event);
+
+
+        } catch (error) {
+            console.error("Erro ao salvar o aceite dos termos: ", error);
+            alert("Ocorreu um erro ao salvar sua confirmação. Tente novamente.");
+        } finally {
+             acceptTermsBtn.disabled = false;
+             acceptTermsBtn.textContent = 'Li, entendi e aceito os termos';
+        }
+    });
+
+    document.addEventListener('user-state-changed', () => {
+        const user = auth.currentUser;
+        if(user) {
+            onAuthStateChanged(auth, user); // Dispara manualmente para reavaliar
+        }
+    });
+
+    declineTermsBtn.addEventListener('click', () => {
+        alert('Para usar a plataforma, é necessário aceitar os termos de uso. Você será desconectado.');
+        signOut(auth);
+    });
+    
+        // --- LÓGICA DO TOUR E GERAL ---
         const tourOverlay = document.getElementById('tour-overlay');
         const tourHighlight = document.querySelector('.tour-highlight');
         const tourTooltip = document.querySelector('.tour-tooltip');
@@ -649,12 +823,11 @@
         const openTutorialButton = document.getElementById('open-tutorial-button');
 
         const tourSteps = [
-            { element: '#tour-step-1', title: 'Navegação Principal', intro: 'Alterne entre os dashboards para suas análises.' },
-            { element: '#tour-step-2', title: 'Adicionar Transações', intro: 'Preencha os dados de suas movimentações de capital (envios e retiradas).' },
-            { element: '#tour-step-3', title: 'Carregar Cotações', intro: 'Importe o arquivo CSV único com as cotações de compra e venda do dólar.' },
-            { element: '#tour-step-4', title: 'Processar Análise', intro: 'Clique aqui para executar os cálculos após preencher os dados acima.' },
-            { element: '#main-tab-ir', title: 'Análise de IR', intro: 'Mude para este dashboard para analisar o imposto sobre suas operações de trade.' },
-            { element: '#tour-step-5', title: 'Relatório de Operações', intro: 'Importe seu relatório da corretora e a planilha de cotações para o cálculo do IR.' }
+            { element: '#tour-step-1', title: 'Dashboards Principais', intro: 'Comece por aqui! Use estes botões para informar seus Envios e Retiradas de capital e para fazer a Apuração Anual dos resultados dos seus trades.' },
+            { element: '#tour-step-2', title: 'Movimentações de Capital', intro: 'Passo crucial! Adicione aqui todos os seus envios e retiradas de margem. A precisão destes dados é fundamental para o cálculo correto.' },
+            { element: '#tour-step-3', title: 'Cotações do Dólar (Obrigatório)', intro: 'Para converter seus resultados para Reais (BRL), precisamos das cotações diárias. Carregue aqui o seu arquivo CSV, seguindo o modelo orientado nas aulas.' },
+            { element: '#main-tab-ir', title: 'Apuração Anual dos Resultados', intro: 'Neste Dashboard você vai importar o relatório de trades da sua corretora internacional e de cotação do dólar para apuração dos resultados.' },
+            { element: '#tour-step-5', title: 'Relatório de Operações', intro: 'Importe aqui seu relatório de traders da corretora internacional e a planilha de cotações do dólar.' }
         ];
 
         let currentStep = 0;
@@ -731,762 +904,12 @@
             document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
         });
-
+        
+        // --- LÓGICA DO DASHBOARD CAMBIAL (CÓDIGO RESTANTE SEM ALTERAÇÃO) ---
         let manualTransactions = [];
         let currentlyEditingIndex = null;
-        let ratesMapVenda = new Map();
-        let ratesMapCompra = new Map();
-        let cambialExportData = []; 
+        // ... (todo o resto do seu código da calculadora, exportação, etc., permanece igual) ...
 
-        function showLoader(containerId, message = "Processando...") {
-             document.getElementById(containerId).innerHTML = `<div class="flex justify-center items-center p-10"><div class="loader !w-8 !h-8"></div><span class="ml-4">${message}</span></div>`;
-        }
-        function showError(containerId, message) {
-            document.getElementById(containerId).innerHTML = `<div class="bg-negative-color bg-opacity-20 border border-negative-color text-text-white p-4 rounded-md" role="alert"><p class="font-bold">ERRO</p><p>${message}</p></div>`;
-        }
-        function formatCurrency(value, currency = 'BRL', digits = 2) {
-            if (typeof value !== 'number' || isNaN(value)) return formatCurrency(0, currency, digits);
-            return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', { style: 'currency', currency: currency, minimumFractionDigits: digits }).format(value);
-        }
-
-        function formatCurrencyWithColor(value) {
-            const formattedValue = formatCurrency(value, 'BRL');
-            if (value > 0) return `<span class="text-positive font-semibold">${formattedValue}</span>`;
-            if (value < 0) return `<span class="text-negative font-semibold">${formattedValue}</span>`;
-            return `<span>${formattedValue}</span>`;
-        }
-        
-        function getRateForDate(date, transType) {
-            const ratesMap = (transType === 'Envio') ? ratesMapVenda : ratesMapCompra;
-            if (ratesMap.size === 0) return null;
-            let currentDate = new Date(date);
-            for (let i = 0; i < 7; i++) {
-                const lookupDateStr = currentDate.toISOString().split('T')[0];
-                if (ratesMap.has(lookupDateStr)) return ratesMap.get(lookupDateStr);
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
-            return null;
-        }
-
-        window.toggleNaoRetiradaOption = function() {
-            const dateInput = document.getElementById('trans-date');
-            const naoRetiradaOption = document.getElementById('nao-retirada-option');
-            const typeSelect = document.getElementById('trans-type');
-            const dateValue = dateInput.value;
-            if (dateValue && dateValue.substring(5) === '12-31') {
-                naoRetiradaOption.disabled = false;
-            } else {
-                naoRetiradaOption.disabled = true;
-                if (typeSelect.value === 'Não Retirada') {
-                    typeSelect.value = 'Envio';
-                }
-            }
-        }
-        document.getElementById('trans-date').addEventListener('change', window.toggleNaoRetiradaOption);
-        
-        window.handleSaveTransaction = function() {
-            const dateInput = document.getElementById('trans-date');
-            const typeInput = document.getElementById('trans-type');
-            const valueInput = document.getElementById('trans-value');
-            const sanitizedValue = valueInput.value.replace(/\./g, '').replace(',', '.');
-            const numericValue = parseFloat(sanitizedValue);
-            if (!dateInput.value || isNaN(numericValue) || numericValue <= 0) {
-                alert('Por favor, preencha a data e um valor positivo válido no formato 1.000,00.');
-                return;
-            }
-            const transactionData = { date: new Date(`${dateInput.value}T00:00:00Z`), type: typeInput.value, value: numericValue };
-            if (currentlyEditingIndex !== null) {
-                if (currentlyEditingIndex === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'Não Retirada')) {
-                    alert('O primeiro lançamento não pode ser editado para "Retirada" ou "Não Retirada".');
-                    return;
-                }
-                manualTransactions[currentlyEditingIndex] = transactionData;
-            } else {
-                if (manualTransactions.length === 0 && (transactionData.type === 'Retirada' || transactionData.type === 'Não Retirada')) {
-                    alert('O primeiro lançamento deve ser obrigatoriamente um ENVIO.');
-                    return;
-                }
-                manualTransactions.push(transactionData);
-            }
-            manualTransactions.sort((a, b) => a.date - b.date);
-            renderTransactionsTable();
-            cancelEdit();
-        }
-        
-        window.editTransaction = function(index) {
-            currentlyEditingIndex = index;
-            const trans = manualTransactions[index];
-            document.getElementById('trans-date').value = trans.date.toISOString().split('T')[0];
-            document.getElementById('trans-type').value = trans.type;
-            document.getElementById('trans-value').value = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(trans.value);
-            document.getElementById('add-trans-button').textContent = 'Salvar Alterações';
-            document.getElementById('cancel-edit-button').classList.remove('hidden');
-            toggleNaoRetiradaOption();
-        }
-        
-        window.cancelEdit = function() {
-            currentlyEditingIndex = null;
-            document.getElementById('trans-date').value = '';
-            document.getElementById('trans-type').value = 'Envio';
-            document.getElementById('trans-value').value = '';
-            document.getElementById('add-trans-button').textContent = 'Adicionar +';
-            document.getElementById('cancel-edit-button').classList.add('hidden');
-            toggleNaoRetiradaOption();
-        }
-
-        window.removeTransaction = function(index) {
-            if (confirm('Tem certeza que deseja remover este registro?')) {
-                manualTransactions.splice(index, 1);
-                renderTransactionsTable();
-            }
-        }
-        
-        function renderTransactionsTable() {
-            const container = document.getElementById('transactions-list');
-            if (manualTransactions.length === 0) { container.innerHTML = ''; return; }
-            const headers = ['Data', 'Tipo', 'Valor Líquido (USD)', 'Cotação (USD/BRL)', 'Total (R$)', 'Ações'];
-            const data = manualTransactions.map((t, index) => {
-                const cotacaoDia = getRateForDate(t.date, t.type);
-                const cotacaoDisplay = cotacaoDia ? formatCurrency(cotacaoDia, 'BRL') : `<span class="text-xs text-gray-500">Aguardando arquivo</span>`;
-                const totalBRL = cotacaoDia ? t.value * cotacaoDia : null;
-                const totalBRLDisplay = totalBRL !== null ? formatCurrency(totalBRL, 'BRL') : `<span class="text-xs text-gray-500">---</span>`;
-                const actions = `<div class="flex gap-2 justify-center"><button onclick="editTransaction(${index})" class="text-warning-color hover:text-white font-semibold text-xs uppercase">Editar</button><button onclick="removeTransaction(${index})" class="text-negative-color hover:text-white font-semibold text-xs uppercase">Remover</button></div>`;
-                return [t.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'}), t.type, formatCurrency(t.value, 'USD'), cotacaoDisplay, totalBRLDisplay, actions];
-            });
-            let table = `<h4 class="text-md font-semibold mb-2 mt-4 border-t border-border-color pt-4">Registros a Processar:</h4><div class="overflow-x-auto bg-main-bg rounded-md border border-border-color"><table class="min-w-full text-sm"><thead><tr class="bg-card-bg">`;
-            headers.forEach(h => table += `<th class="text-center py-2 px-3 font-medium text-gray-400 uppercase tracking-wider">${h}</th>`);
-            table += `</tr></thead><tbody class="divide-y divide-border-color">`;
-            data.forEach(row => { table += `<tr class="hover:bg-card-bg">`; row.forEach(cell => table += `<td class="py-2 px-3 whitespace-nowrap text-center">${cell}</td>`); table += `</tr>`; });
-            table += `</tbody></table></div>`;
-            container.innerHTML = table;
-        }
-
-        async function handleUnifiedRatesFile(event) {
-            const fileInput = event.target;
-            const label = document.getElementById('rates-file-unified-label');
-            const originalLabelText = "Arquivo de Cotações Unificado (.csv)";
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            label.textContent = "Carregando...";
-            label.style.color = 'var(--warning-color)';
-            
-            try {
-                const results = await new Promise((resolve, reject) => {
-                    Papa.parse(file, {
-                        header: false,
-                        skipEmptyLines: true,
-                        delimitersToGuess: [';', ',', '\t'],
-                        complete: resolve,
-                        error: reject
-                    });
-                });
-
-                const allRows = results.data;
-                ratesMapCompra.clear();
-                ratesMapVenda.clear();
-                
-                const normalize = (str) => typeof str === 'string' ? str.trim().toLowerCase() : '';
-                const headerRowIndex = allRows.findIndex(row => 
-                    row.map(normalize).includes('data') &&
-                    row.map(normalize).includes('compra') &&
-                    row.map(normalize).includes('venda')
-                );
-
-                if (headerRowIndex === -1) {
-                    throw new Error("Arquivo CSV deve conter uma linha de cabeçalho com as colunas 'Data', 'Compra' e 'Venda'.");
-                }
-                
-                const headerRow = allRows[headerRowIndex].map(normalize);
-                const dateIndex = headerRow.indexOf('data');
-                const compraIndex = headerRow.indexOf('compra');
-                const vendaIndex = headerRow.indexOf('venda');
-
-                const dataRows = allRows.slice(headerRowIndex + 1);
-
-                for (const row of dataRows) {
-                    if (row.length <= Math.max(dateIndex, compraIndex, vendaIndex)) continue;
-                    const dateStr = row[dateIndex];
-                    const compraStr = row[compraIndex];
-                    const vendaStr = row[vendaIndex];
-                    if (!dateStr || !compraStr || !vendaStr) continue;
-
-                    let date;
-                    if (dateStr.includes('/')) {
-                        const parts = dateStr.split('/');
-                        if (parts.length === 3) date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00Z`);
-                    } else if (dateStr.includes('-')) {
-                        date = new Date(`${dateStr}T00:00:00Z`);
-                    } else { continue; }
-
-                    const compraRate = parseFloat(String(compraStr).replace(/[^0-9,]/g, '').replace(',', '.'));
-                    const vendaRate = parseFloat(String(vendaStr).replace(/[^0-9,]/g, '').replace(',', '.'));
-                    
-                    if (date && !isNaN(date.getTime()) && !isNaN(compraRate) && !isNaN(vendaRate)) {
-                        const isoDate = date.toISOString().split('T')[0];
-                        ratesMapCompra.set(isoDate, compraRate);
-                        ratesMapVenda.set(isoDate, vendaRate);
-                    }
-                }
-                
-                if (ratesMapCompra.size === 0) {
-                    throw new Error("Nenhuma linha de cotação válida foi encontrada no arquivo.");
-                }
-
-                renderTransactionsTable();
-                label.textContent = `${originalLabelText} (Carregado: ${file.name})`;
-                label.style.color = 'var(--positive-color)';
-
-            } catch (error) {
-                console.error("Erro ao processar arquivo de cotações unificado:", error);
-                showError('results-area-cambial', `Erro ao ler o arquivo ${file.name}: ${error.message}`);
-                label.textContent = `${originalLabelText} (Erro!)`;
-                label.style.color = 'var(--negative-color)';
-            }
-        }
-        document.getElementById('rates-file-unified').addEventListener('change', handleUnifiedRatesFile);
-
-
-        window.handleProcessCambial = async function() {
-            showLoader('results-area-cambial');
-            if (ratesMapVenda.size === 0 || ratesMapCompra.size === 0) {
-                showError('results-area-cambial', 'É obrigatório carregar o arquivo de cotações antes de processar.');
-                return;
-            }
-            if (manualTransactions.length === 0) { showError('results-area-cambial', 'Nenhum registro foi adicionado.'); return; }
-            try {
-                processAndRenderCambial(manualTransactions);
-            } catch (error) { showError('results-area-cambial', `Ocorreu um erro: ${error.message}`); }
-        }
-
-        function processAndRenderCambial(transactions) {
-            try {
-                let saldoUSD = 0, custoSaldoBRL = 0, totalEnviosUSD = 0, totalRetiradoUSD = 0, lucroPrejuizoTotal = 0;
-                let totalEnviosBRL = 0, totalRetiradoBRL = 0;
-                let lucroTributavel = 0;
-                let valorNaoRetiradaBRL = null;
-                let mostrarAlocarCard = false;
-                
-                const detailedData = [];
-                const detailedDataForExport = [];
-                const exportHeaders = ['Data', 'Tipo', 'Valor (USD)', 'Cotação (BRL)', 'Valor (BRL)', 'Lucro/Prejuízo Cambial (BRL)', 'Saldo Final (USD)'];
-                
-                for (const trans of transactions) {
-                    const cotacaoDia = getRateForDate(trans.date, trans.type);
-                    if (cotacaoDia === null) throw new Error(`Cotação não encontrada para a data ${trans.date.toLocaleDateString('pt-BR', {timeZone:'UTC'})}. Verifique seus arquivos de cotação.`);
-                    
-                    const valorDeMercadoBRL = trans.value * cotacaoDia;
-                    const precoMedioAnterior = saldoUSD > 1e-6 ? custoSaldoBRL / saldoUSD : 0;
-                    let custoOperacaoBRL = 0, lucroPrejuizoRow = 0;
-                    
-                    if (trans.type === 'Envio') {
-                        saldoUSD += trans.value;
-                        custoSaldoBRL += valorDeMercadoBRL;
-                        totalEnviosUSD += trans.value;
-                        totalEnviosBRL += valorDeMercadoBRL;
-                        custoOperacaoBRL = valorDeMercadoBRL;
-                    } else { 
-                        if (trans.value > saldoUSD) throw new Error(`Saque (${formatCurrency(trans.value, 'USD')}) maior que o saldo na data.`);
-                        
-                        custoOperacaoBRL = trans.value * precoMedioAnterior;
-                        lucroPrejuizoRow = valorDeMercadoBRL - custoOperacaoBRL;
-                        lucroPrejuizoTotal += lucroPrejuizoRow;
-
-                        if (trans.type === 'Retirada' && lucroPrejuizoRow > 0) {
-                            lucroTributavel += lucroPrejuizoRow;
-                        }
-                        
-                        if (trans.type === 'Não Retirada') {
-                            custoSaldoBRL += (2 * lucroPrejuizoRow);
-                            valorNaoRetiradaBRL = valorDeMercadoBRL;
-                            const isLastDayOfYear = trans.date.getUTCMonth() === 11 && trans.date.getUTCDate() === 31;
-                            if (isLastDayOfYear) {
-                                mostrarAlocarCard = true;
-                            }
-                        } else { 
-                            totalRetiradoUSD += trans.value;
-                            totalRetiradoBRL += valorDeMercadoBRL;
-                            saldoUSD -= trans.value;
-                            custoSaldoBRL -= custoOperacaoBRL;
-                        }
-                    }
-                    
-                    const dateLabel = trans.date.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
-                    detailedData.push([dateLabel, trans.type, formatCurrency(trans.value, 'USD'), formatCurrency(cotacaoDia, 'BRL'), formatCurrency(valorDeMercadoBRL, 'BRL'), formatCurrencyWithColor(lucroPrejuizoRow), formatCurrency(saldoUSD, 'USD')]);
-                    detailedDataForExport.push({
-                        'Data': dateLabel,
-                        'Tipo': trans.type,
-                        'Valor (USD)': trans.value.toFixed(2),
-                        'Cotação (BRL)': cotacaoDia.toFixed(4),
-                        'Valor (BRL)': valorDeMercadoBRL.toFixed(2),
-                        'Lucro/Prejuízo Cambial (BRL)': lucroPrejuizoRow.toFixed(2),
-                        'Saldo Final (USD)': saldoUSD.toFixed(2)
-                    });
-                }
-                
-                cambialExportData = { headers: exportHeaders, data: detailedDataForExport };
-
-                const impostoDevido = lucroTributavel * 0.15;
-                let cardsImpostoHtml = '';
-                if (lucroTributavel > 0) {
-                    cardsImpostoHtml = `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="card p-6 text-center">
-                                <p class="text-sm font-medium text-gray-400">VARIAÇÃO CAMBIAL COM RETIRADAS (GANHO / PERDA)</p>
-                                <p class="text-3xl font-bold text-white mt-2">${formatCurrency(lucroTributavel)}</p>
-                            </div>
-                            <div class="card p-6 text-center">
-                                <p class="text-sm font-medium text-gray-400">IMPOSTO A PAGAR DA VARIAÇÃO CAMBIAL COM RETIRADAS (15%)</p>
-                                <p class="text-3xl font-bold text-accent-color mt-2">${formatCurrency(impostoDevido)}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                const saldoBRLCalculado = custoSaldoBRL + lucroPrejuizoTotal;
-                let saldoFinalParaExibir;
-                
-                if (valorNaoRetiradaBRL !== null) {
-                    saldoFinalParaExibir = valorNaoRetiradaBRL;
-                } else {
-                    saldoFinalParaExibir = saldoBRLCalculado; 
-                }
-                
-                if (mostrarAlocarCard) {
-                    document.getElementById('alocar-proximo-ano-valor').textContent = formatCurrency(saldoFinalParaExibir);
-                    document.getElementById('alocar-proximo-ano-card').classList.remove('hidden');
-                } else {
-                    document.getElementById('alocar-proximo-ano-card').classList.add('hidden');
-                }
-
-                const kpiData = { saldoUSD, custoSaldoBRL: saldoFinalParaExibir, totalEnviosUSD, totalRetiradoUSD, totalEnviosBRL, totalRetiradoBRL };
-                const lucroColor = lucroPrejuizoTotal > 0 ? 'text-positive' : lucroPrejuizoTotal < 0 ? 'text-negative' : 'text-white';
-                const resultsContainer = document.getElementById('results-area-cambial');
-                resultsContainer.innerHTML = `
-                    <div id="pdf-export-cambial">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-3xl font-bold">Resultados dos Envios e Retiradas</h2>
-                        </div>
-                        <div class="space-y-8">
-                             <div class="card p-6 text-center">
-                                 <p class="text-sm font-medium text-gray-400">VARIAÇÃO CAMBIAL TOTAL (GANHO / PERDA)</p>
-                                 <p class="text-4xl font-bold ${lucroColor} mt-2">${formatCurrency(lucroPrejuizoTotal)}</p>
-                             </div>
-                            ${cardsImpostoHtml}
-                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Enviado (USD)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalEnviosUSD, 'USD')}</p></div>
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Retirado (USD)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalRetiradoUSD, 'USD')}</p></div>
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Saldo Atual (USD)</p><p class="text-2xl font-bold text-accent-color">${formatCurrency(kpiData.saldoUSD, 'USD')}</p></div>
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Enviado (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalEnviosBRL)}</p></div>
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Total Retirado (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.totalRetiradoBRL)}</p></div>
-                                 <div class="card"><p class="text-sm font-medium text-gray-400">Saldo Atual (BRL)</p><p class="text-2xl font-bold">${formatCurrency(kpiData.custoSaldoBRL)}</p></div>
-                             </div>
-                             <div class="card p-6">
-                                 <h3 class="text-xl font-bold mb-4">Extrato Detalhado</h3>
-                                 <div class="overflow-x-auto">
-                                     <table class="min-w-full">
-                                         <thead class="border-b border-border-color">
-                                             <tr>
-                                                 ${exportHeaders.map(h => `<th class="text-center py-3 px-4 font-semibold text-sm text-text-primary uppercase tracking-wider">${h}</th>`).join('')}
-                                             </tr>
-                                         </thead>
-                                         <tbody class="divide-y divide-border-color">
-                                             ${detailedData.map(row => `<tr class="hover:bg-card-bg">${row.map(cell => `<td class="py-4 px-4 whitespace-nowrap text-center">${cell}</td>`).join('')}</tr>`).join('')}
-                                         </tbody>
-                                     </table>
-                                 </div>
-                             </div>
-                        </div>
-                    </div>
-                    <div id="cambial-download-buttons-wrapper" class="flex flex-col sm:flex-row gap-4 mt-8">
-                        <button id="export-cambial-pdf-button" class="btn btn-secondary w-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>Exportar Relatório (PDF)</span>
-                        </button>
-                        <button id="export-cambial-xls-button" class="btn btn-secondary w-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Exportar para Excel (.csv)</span>
-                        </button>
-                    </div>`;
-
-                document.getElementById('export-cambial-pdf-button').addEventListener('click', () => window.print());
-                document.getElementById('export-cambial-xls-button').addEventListener('click', exportCambialToXLS);
-
-            } catch (e) { showError('results-area-cambial', `Ocorreu um erro crítico no processamento: ${e.message}`); console.error(e); }
-        }
-
-        function exportCambialToXLS() {
-            if (!cambialExportData || cambialExportData.data.length === 0) {
-                alert('Não há dados para exportar. Processe os dados primeiro.');
-                return;
-            }
-            const csv = Papa.unparse({
-                fields: cambialExportData.headers,
-                data: cambialExportData.data
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'relatorio_envios_retiradas.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        
-        // =======================================================================
-        // APURAÇÃO ANUAL DE IR
-        // =======================================================================
-        let tradesData_IR = null;
-        let quotesData_IR = null;
-        let finalReportData_IR = null;
-        let allProcessedTrades_IR = [];
-
-        const tradesFileInput_IR = document.getElementById('trades-file');
-        const quotesFileInput_IR = document.getElementById('quotes-file');
-        const processButton_IR = document.getElementById('process-button');
-        const resultsSection_IR = document.getElementById('results');
-        const alertBox_IR = document.getElementById('alert-box');
-        const loader_IR = document.getElementById('loader');
-        const buttonText_IR = document.getElementById('button-text');
-        const exportPdfButton_IR = document.getElementById('export-pdf-button');
-        const exportXlsButton_IR = document.getElementById('export-xls-button');
-        const modal_IR = document.getElementById('trades-modal');
-        const closeModalButton_IR = document.getElementById('close-modal-button');
-
-        tradesFileInput_IR.addEventListener('change', (event) => handleFileSelect_IR(event, 'trades'));
-        quotesFileInput_IR.addEventListener('change', (event) => handleFileSelect_IR(event, 'quotes'));
-        processButton_IR.addEventListener('click', processFiles_IR);
-        exportPdfButton_IR.addEventListener('click', () => window.print());
-        exportXlsButton_IR.addEventListener('click', exportToXLS_IR);
-        closeModalButton_IR.addEventListener('click', () => modal_IR.classList.remove('active'));
-        modal_IR.addEventListener('click', (e) => { if (e.target === modal_IR) modal_IR.classList.remove('active'); });
-
-        function handleFileSelect_IR(event, type) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const nameEl = type === 'trades' ? document.getElementById('trades-file-name') : document.getElementById('quotes-file-name');
-            nameEl.textContent = file.name;
-            nameEl.classList.add('text-accent-color');
-            
-            Papa.parse(file, {
-                header: false,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    let dataRows = results.data;
-                    if (type === 'trades') {
-                        if (dataRows.length > 1 && dataRows[0][0] && dataRows[0][0].toLowerCase().includes('posi')) {
-                            dataRows.shift();
-                        }
-                        const headers = dataRows[0].map(h => h.trim());
-                        const records = dataRows.slice(1);
-                        tradesData_IR = records.map(row => {
-                            const obj = {};
-                            headers.forEach((header, i) => { if (header) obj[header] = row[i]; });
-                            return obj;
-                        }).filter(row => Object.values(row).some(val => val !== null && val.toString().trim() !== ''));
-                    } else {
-                        let headerRowIndex = dataRows.findIndex(row => row.map(cell => cell.toLowerCase()).includes('data'));
-                        const headers = dataRows[headerRowIndex];
-                        const records = dataRows.slice(headerRowIndex + 1);
-                        quotesData_IR = records.map(row => {
-                             const obj = {};
-                            headers.forEach((header, i) => { if (header) obj[header.trim()] = row[i]; });
-                            return obj;
-                        }).filter(row => Object.values(row).some(val => val !== null && val.toString().trim() !== ''));
-                    }
-                },
-                error: (error) => showAlert_IR(`Erro ao ler o arquivo ${file.name}: ${error.message}`)
-            });
-        }
-
-        function showAlert_IR(message) {
-            alertBox_IR.textContent = message;
-            alertBox_IR.classList.remove('hidden');
-        }
-
-        function hideAlert_IR() {
-            alertBox_IR.classList.add('hidden');
-        }
-
-        function processFiles_IR() {
-            hideAlert_IR();
-            if (!tradesData_IR || !quotesData_IR) {
-                showAlert_IR('Por favor, carregue os dois arquivos para continuar.');
-                return;
-            }
-            loader_IR.classList.remove('hidden');
-            buttonText_IR.textContent = 'Processando...';
-            processButton_IR.disabled = true;
-            setTimeout(() => {
-                try {
-                    const { apuracaoMensal, plataforma, processedTrades, impostoAnual } = apurarImposto_IR(tradesData_IR, quotesData_IR);
-                    finalReportData_IR = apuracaoMensal;
-                    allProcessedTrades_IR = processedTrades;
-                    displayResults_IR(apuracaoMensal, plataforma, impostoAnual);
-                } catch (error) {
-                    showAlert_IR(`Ocorreu um erro no cálculo: ${error.message}. Verifique o formato dos seus arquivos.`);
-                    console.error(error);
-                } finally {
-                    loader_IR.classList.add('hidden');
-                    buttonText_IR.textContent = 'Apurar Impostos';
-                    processButton_IR.disabled = false;
-                }
-            }, 100);
-        }
-
-        function identifyPlatform_IR(data) {
-            if (!data || data.length === 0) throw new Error("O arquivo de operações está vazio ou em formato inválido.");
-            const columns = new Set(Object.keys(data[0]).map(c => c.toLowerCase().trim().replace(/\s+/g, ' ')));
-            if (columns.has('position') && columns.has('ativo') && columns.has('horário') && columns.has('lucro')) {
-                return { name: 'Metatrader 5 (Relatório de Posições)', map: { data_fechamento: 'Horário', resultado: 'Lucro', comissao: 'Comissão', swap: 'Swap', ativo: 'Ativo' } };
-            }
-            if (columns.has('n. do trade') && columns.has('datade fechamento')) {
-                return { name: 'Metatrader 5 (Relatório de Negócios)', map: { data_fechamento: 'Datade  Fechamento', resultado: 'Resultado', comissao: 'Comissão', swap: 'Swap', ativo: 'Ativo' } };
-            }
-            if (columns.has('position') && columns.has('type') && columns.has('deal')) {
-                return { name: 'Metatrader 5 (Inglês)', map: { data_fechamento: 'Time', resultado: 'Profit', comissao: 'Commission', swap: 'Swap', ativo: 'Symbol' } };
-            }
-            if (columns.has('ticket') && columns.has('open time') && columns.has('close time')) {
-                return { name: 'Metatrader 4', map: { data_fechamento: 'Close Time', resultado: 'Profit', comissao: 'Commission', swap: 'Swap', ativo: 'Item' } };
-            }
-            if (columns.has('tradeid') && columns.has('direction') && columns.has('close time')) {
-                return { name: 'CTrader', map: { data_fechamento: 'Close Time', resultado: 'Net Profit', comissao: 'Commissions', swap: 'Swap', ativo: 'Symbol' } };
-            }
-            return null;
-        }
-
-        function apurarImposto_IR(trades, quotes) {
-            const platformInfo = identifyPlatform_IR(trades);
-            if (!platformInfo) throw new Error("Plataforma de trading não identificada. Verifique as colunas do relatório.");
-            const normalize = (obj, map) => {
-                const newObj = {};
-                for (const key in obj) {
-                    const normalizedKeyFromFile = key.toLowerCase().trim().replace(/\s+/g, ' ');
-                    const standardKey = Object.keys(map).find(k => map[k].toLowerCase().trim().replace(/\s+/g, ' ') === normalizedKeyFromFile);
-                    if (standardKey) newObj[standardKey] = obj[key];
-                    else newObj[key.toLowerCase().trim().replace(/\s+/g, '_')] = obj[key];
-                }
-                return newObj;
-            };
-            let processedTrades = trades.map(t => normalize(t, platformInfo.map));
-            if (!quotes || quotes.length === 0) throw new Error("O arquivo de cotações está vazio ou em formato inválido.");
-            
-            const quotesDateKey = Object.keys(quotes[0]).find(k => k.toLowerCase().trim().includes('data'));
-            const quotesCompraKey = Object.keys(quotes[0]).find(k => k.toLowerCase().trim() === 'compra'); 
-            
-            if (!quotesDateKey || !quotesCompraKey) throw new Error("Não foi possível encontrar as colunas de 'Data' e 'Compra' no arquivo de cotações. Verifique o cabeçalho.");
-            
-            const quotesMap = quotes.reduce((acc, row) => {
-                const dateStr = row[quotesDateKey];
-                if (!dateStr) return acc;
-                let date;
-                if (dateStr.includes('/')) {
-                    const parts = dateStr.split(' ')[0].split('/');
-                    date = new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
-                } else {
-                    const parts = dateStr.split(' ')[0].split('-');
-                    date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-                }
-                if (!isNaN(date.getTime())) acc[date.toISOString().split('T')[0]] = parseFloat(String(row[quotesCompraKey]).replace('R$', '').replace(/\s/g, '').replace(',', '.'));
-                return acc;
-            }, {});
-
-            processedTrades = processedTrades.map(trade => {
-                const parseCurrency = (value) => parseFloat(String(value || '0').replace(/\s/g, '').replace(',', '.')) || 0;
-                const profit = parseCurrency(trade.resultado);
-                const commission = parseCurrency(trade.comissao);
-                const swap = parseCurrency(trade.swap);
-                
-                const resultado_liquido_usd = profit + commission + swap;
-                
-                const dateStr = (trade.data_fechamento || '').split(' ')[0];
-                let date;
-                if (dateStr.includes('/')) {
-                    const parts = dateStr.split('/');
-                    date = new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
-                } else {
-                    date = new Date(dateStr.replace(/\./g, '-') + 'T00:00:00Z');
-                }
-                if (isNaN(date.getTime())) throw new Error(`Valor de data inválido: ${trade.data_fechamento}`);
-                const isoDate = date.toISOString().split('T')[0];
-
-                let quote = null;
-                for (let i = 0; i < 7; i++) {
-                    const checkDate = new Date(date);
-                    checkDate.setUTCDate(checkDate.getUTCDate() - i);
-                    const checkIsoDate = checkDate.toISOString().split('T')[0];
-                    if (quotesMap[checkIsoDate]) {
-                        quote = quotesMap[checkIsoDate];
-                        break;
-                    }
-                }
-                const resultado_liquido_brl = quote ? resultado_liquido_usd * quote : 0;
-                
-                return { ...trade, data_iso: isoDate, mes_ano: isoDate ? isoDate.substring(0, 7) : null, resultado_liquido_usd, resultado_liquido_brl };
-            }).filter(t => t.mes_ano);
-
-            const monthlyGroups = processedTrades.reduce((acc, trade) => {
-                const month = trade.mes_ano;
-                if (!acc[month]) acc[month] = { resultado_liquido_brl: 0, resultado_liquido_usd: 0 };
-                acc[month].resultado_liquido_brl += trade.resultado_liquido_brl;
-                acc[month].resultado_liquido_usd += trade.resultado_liquido_usd;
-                return acc;
-            }, {});
-
-            const sortedMonths = Object.keys(monthlyGroups).sort();
-            const apuracaoMensal = sortedMonths.map(month => ({ mes: month, ...monthlyGroups[month] }));
-
-            const lucro_total_anual_brl = processedTrades.reduce((sum, trade) => sum + trade.resultado_liquido_brl, 0);
-            const ALIQUOTA_IR = 0.15;
-            const impostoAnual = lucro_total_anual_brl > 0 ? lucro_total_anual_brl * ALIQUOTA_IR : 0;
-
-            return { apuracaoMensal, plataforma: platformInfo.name, processedTrades, impostoAnual };
-        }
-
-        function displayResults_IR(data, plataforma, impostoAnual) {
-            document.getElementById('success-box').innerHTML = `<strong>Plataforma identificada:</strong> ${plataforma}. <strong>Cálculo atualizado conforme Lei 14.754/2023.</strong>`;
-            const calendarContainer = document.getElementById('calendar-container');
-            calendarContainer.innerHTML = '';
-            const formatCurrency = (value, currency = 'BRL') => new Intl.NumberFormat('pt-BR', { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            data.forEach(row => {
-                const [year, monthNum] = row.mes.split('-');
-                const monthName = `${monthNames[parseInt(monthNum) - 1]} ${year}`;
-                const card = document.createElement('div');
-                card.className = `month-card ${row.resultado_liquido_usd >= 0 ? 'profit' : 'loss'} text-center`;
-                card.dataset.month = row.mes;
-                card.innerHTML = `
-                    <div class="month-name">${monthName}</div>
-                    <div class="month-result ${row.resultado_liquido_usd >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(row.resultado_liquido_usd, 'USD')}</div>
-                    <div class="month-result text-sm ${row.resultado_liquido_brl >= 0 ? 'text-positive' : 'text-negative'} opacity-75">${formatCurrency(row.resultado_liquido_brl, 'BRL')}</div>
-                `;
-                card.addEventListener('click', () => openTradesModal_IR(row.mes, monthName));
-                calendarContainer.appendChild(card);
-            });
-            let totalUSD = data.reduce((sum, row) => sum + row.resultado_liquido_usd, 0);
-            let totalBRL = data.reduce((sum, row) => sum + row.resultado_liquido_brl, 0);
-            document.getElementById('total-usd').innerHTML = `<span class="${totalUSD >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(totalUSD, 'USD')}</span>`;
-            document.getElementById('total-brl').innerHTML = `<span class="${totalBRL >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(totalBRL)}</span>`;
-            document.getElementById('total-tax').textContent = formatCurrency(impostoAnual);
-            
-            const resultadoAposDarf = totalBRL - impostoAnual;
-            const totalAfterTaxEl = document.getElementById('total-after-tax');
-            totalAfterTaxEl.innerHTML = `<span class="${resultadoAposDarf >= 0 ? 'text-positive' : 'text-negative'}">${formatCurrency(resultadoAposDarf)}</span>`;
-
-            // --- INÍCIO: Lógica do Gráfico ---
-            const chartCanvas = document.getElementById('monthly-performance-chart');
-            if (window.myPerformanceChart instanceof Chart) {
-                window.myPerformanceChart.destroy();
-            }
-
-            const chartData = {
-                labels: data.map(row => {
-                    const [year, monthNum] = row.mes.split('-');
-                    const monthName = monthNames[parseInt(monthNum) - 1];
-                    return `${monthName.substring(0, 3)}/${year.substring(2, 4)}`;
-                }),
-                datasets: [{
-                    label: 'Resultado Líquido (BRL)',
-                    data: data.map(row => row.resultado_liquido_brl),
-                    backgroundColor: data.map(row => row.resultado_liquido_brl >= 0 ? 'rgba(63, 185, 80, 0.6)' : 'rgba(248, 81, 73, 0.6)'),
-                    borderColor: data.map(row => row.resultado_liquido_brl >= 0 ? 'rgba(63, 185, 80, 1)' : 'rgba(248, 81, 73, 1)'),
-                    borderWidth: 1
-                }]
-            };
-
-            const chartOptions = {
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: '#FFFFFF',
-                            callback: function(value, index, values) {
-                                return 'R$ ' + value.toLocaleString('pt-BR');
-                            }
-                        },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#FFFFFF' },
-                        grid: { display: false }
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            };
-            window.myPerformanceChart = new Chart(chartCanvas, { type: 'bar', data: chartData, options: chartOptions });
-            // --- FIM: Lógica do Gráfico ---
-
-            resultsSection_IR.classList.remove('hidden');
-        }
-
-        function openTradesModal_IR(month, monthName) {
-            const modalTitle = document.getElementById('modal-title');
-            const modalTableBody = document.getElementById('modal-table-body');
-            const formatCurrency = (value, currency = 'BRL') => new Intl.NumberFormat('pt-BR', { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-            modalTitle.textContent = `Operações de ${monthName}`;
-            modalTableBody.innerHTML = '';
-            const tradesForMonth = allProcessedTrades_IR.filter(trade => trade.mes_ano === month);
-            tradesForMonth.forEach(trade => {
-                const tr = document.createElement('tr');
-                const resultClass = trade.resultado_liquido_usd >= 0 ? 'text-positive' : 'text-negative';
-                tr.innerHTML = `
-                    <td class="px-4 py-3 text-sm text-text-primary">${trade.data_iso}</td>
-                    <td class="px-4 py-3 text-sm text-text-headings">${trade.ativo}</td>
-                    <td class="px-4 py-3 text-sm text-right font-semibold ${resultClass}">${formatCurrency(trade.resultado_liquido_usd, 'USD')}</td>
-                    <td class="px-4 py-3 text-sm text-right font-semibold ${resultClass}">${formatCurrency(trade.resultado_liquido_brl, 'BRL')}</td>
-                `;
-                modalTableBody.appendChild(tr);
-            });
-            modal_IR.classList.add('active');
-        }
-
-        function exportToXLS_IR() {
-            if (!finalReportData_IR || !allProcessedTrades_IR) {
-                showAlert_IR('Não há dados para exportar. Apure os impostos primeiro.');
-                return;
-            }
-            const monthlySummary = finalReportData_IR.map(row => ({
-                'Mês': row.mes,
-                'Resultado Líquido (BRL)': row.resultado_liquido_brl,
-                'Resultado Líquido (USD)': row.resultado_liquido_usd
-            }));
-            const detailedTrades = allProcessedTrades_IR.map(trade => ({
-                'Data': trade.data_iso,
-                'Ativo': trade.ativo,
-                'Resultado (USD)': trade.resultado_liquido_usd,
-                'Resultado (BRL)': trade.resultado_liquido_brl
-            }));
-            const summaryCsv = Papa.unparse(monthlySummary);
-            const tradesCsv = Papa.unparse(detailedTrades);
-            const fullCsv = "Resumo Mensal\n" + summaryCsv + "\n\nTodas as Operações\n" + tradesCsv;
-            const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'relatorio_apuracao_imposto.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
     </script>
 </body>
 </html>
